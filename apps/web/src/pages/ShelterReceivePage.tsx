@@ -1,9 +1,14 @@
-import { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { createDelivery, ApiError } from '../api/client.js';
+import { FormEvent, useEffect, useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import {
+  ApiError,
+  createDelivery,
+  logout as apiLogout,
+  me as apiMe,
+} from '../api/client.js';
 import {
   DeliveryResult,
-  REP_ACCOUNTS,
+  SessionAccount,
   unitLabel,
 } from '../api/types.js';
 import styles from './ShelterReceive.module.css';
@@ -11,20 +16,41 @@ import styles from './ShelterReceive.module.css';
 interface FormState {
   code: string;
   receivedQty: string;
-  accountId: string;
 }
 
-const INITIAL: FormState = {
-  code: '',
-  receivedQty: '1',
-  accountId: REP_ACCOUNTS[0]?.id ?? '',
-};
+const INITIAL: FormState = { code: '', receivedQty: '1' };
+
+type AuthState =
+  | { kind: 'loading' }
+  | { kind: 'no_session' }
+  | { kind: 'ready'; account: SessionAccount };
 
 export function ShelterReceivePage(): JSX.Element {
+  const [auth, setAuth] = useState<AuthState>({ kind: 'loading' });
   const [form, setForm] = useState<FormState>(INITIAL);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<DeliveryResult | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const account = await apiMe();
+        if (!cancelled) setAuth({ kind: 'ready', account });
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 401) {
+          setAuth({ kind: 'no_session' });
+        } else {
+          setAuth({ kind: 'no_session' });
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -45,26 +71,34 @@ export function ShelterReceivePage(): JSX.Element {
       setError('Количество должно быть целым положительным числом');
       return;
     }
-    if (!form.accountId) {
-      setError('Выберите представителя приюта');
-      return;
-    }
+    if (auth.kind !== 'ready') return;
 
     setSubmitting(true);
     try {
       const result = await createDelivery({
         code,
         receivedQty: qty,
-        accountId: form.accountId,
       });
       setDone(result);
       setForm(INITIAL);
     } catch (e) {
+      if (e instanceof ApiError && e.status === 401) {
+        setAuth({ kind: 'no_session' });
+        return;
+      }
       setError(
         e instanceof ApiError ? e.message : 'Не удалось принять помощь. Попробуйте ещё раз.',
       );
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function onLogout() {
+    try {
+      await apiLogout();
+    } finally {
+      setAuth({ kind: 'no_session' });
     }
   }
 
@@ -74,16 +108,42 @@ export function ShelterReceivePage(): JSX.Element {
     setForm(INITIAL);
   }
 
+  if (auth.kind === 'loading') {
+    return (
+      <section className={styles.page}>
+        <p className={styles.muted}>Проверяю сессию…</p>
+      </section>
+    );
+  }
+  if (auth.kind === 'no_session') {
+    return <Navigate to="/login" replace />;
+  }
+
+  const account = auth.account;
+
   return (
     <section className={styles.page}>
       <header className={styles.header}>
         <h1>Принять помощь</h1>
         <p className={styles.muted}>
-          Шаг D2 сценария: даритель привёз помощь в приют. Введите код, который он получил на
-          странице подтверждения. Код показывается один раз и записан как хеш, поэтому изменить
-          решение «задним числом» через повторный ввод того же кода нельзя.
+          Шаг D2 сценария: даритель привёз помощь в приют. Введите код, который он получил
+          на странице подтверждения. Код показывается один раз и записан как хеш, поэтому
+          изменить решение «задним числом» через повторный ввод того же кода нельзя.
         </p>
       </header>
+
+      <aside className={styles.sessionBar}>
+        <span>
+          Вход выполнен как{' '}
+          <strong>
+            {account.username} ({account.role})
+          </strong>
+          . Код будет закреплён за этим представителем.
+        </span>
+        <button type="button" onClick={onLogout} className="secondary">
+          Сменить аккаунт
+        </button>
+      </aside>
 
       {done && (
         <article className={styles.success}>
@@ -113,25 +173,6 @@ export function ShelterReceivePage(): JSX.Element {
 
       {!done && (
         <form onSubmit={onSubmit} className={styles.form}>
-          <label>
-            <span>Представитель приюта</span>
-            <select
-              value={form.accountId}
-              onChange={(e) => update('accountId', e.target.value)}
-              disabled={submitting}
-              required
-            >
-              {REP_ACCOUNTS.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.label}
-                </option>
-              ))}
-            </select>
-            <small className={styles.muted}>
-              В рабочей версии — это cookie-сессия после логина (DEV-09).
-            </small>
-          </label>
-
           <label>
             <span>Код с карточки дарителя</span>
             <input
@@ -184,9 +225,10 @@ export function ShelterReceivePage(): JSX.Element {
           <details>
             <summary>Зачем эти странные буквы в коде?</summary>
             <p>
-              Из 16-символьного алфавита убраны <code>0/O</code>, <code>1/I/L</code> — их путают
-              на слух через стойку приюта. 32 символа × 16 позиций = 80 бит энтропии, коллизия
-              практически невозможна. Подробнее — <code>docs/03_DATA_MODEL.md</code>, §3.
+              Из 16-символьного алфавита убраны <code>0/O</code>, <code>1/I/L</code> — их
+              путают на слух через стойку приюта. 32 символа × 16 позиций = 80 бит
+              энтропии, коллизия практически невозможна. Подробнее —{' '}
+              <code>docs/03_DATA_MODEL.md</code>, §3.
             </p>
           </details>
         </form>

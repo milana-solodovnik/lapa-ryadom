@@ -1,8 +1,10 @@
 import type {
   CreateDeliveryPayload,
   DeliveryResult,
+  LoginPayload,
   Need,
   Paged,
+  SessionAccount,
   Shelter,
   ShelterWithNeeds,
 } from './types.js';
@@ -21,6 +23,7 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
+    credentials: 'include', // pass the lapa_sid cookie back and forth
     headers: { Accept: 'application/json' },
     ...init,
   });
@@ -100,6 +103,27 @@ export async function createDelivery(payload: CreateDeliveryPayload): Promise<De
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
+}
+
+export interface LoginResult {
+  account: SessionAccount;
+  expiresAt: string;
+}
+
+export async function login(payload: LoginPayload): Promise<LoginResult> {
+  return request<LoginResult>('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function me(): Promise<SessionAccount> {
+  return request<SessionAccount>('/auth/me', { method: 'GET' });
+}
+
+export async function logout(): Promise<void> {
+  await request<void>('/auth/logout', { method: 'POST' });
 }
 
 /**

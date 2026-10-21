@@ -1,13 +1,16 @@
 import type { FastifyInstance } from 'fastify';
 import { CreateDeliveryBodySchema } from '../schemas/deliveries.js';
 import { createDelivery } from '../repositories/deliveries.js';
+import { currentAccount } from './auth.js';
 
 const STATUS_BY_REASON: Record<string, number> = {
+  INVALID_BODY: 400,
   INVALID_CODE: 400,
-  ACCOUNT_NOT_FOUND: 404,
-  OFFER_NOT_FOUND: 404,
+  NOT_AUTHENTICATED: 401,
   ACCOUNT_INACTIVE: 403,
   WRONG_SHELTER: 403,
+  ACCOUNT_NOT_FOUND: 404,
+  OFFER_NOT_FOUND: 404,
   OFFER_NOT_RESERVED: 409,
   OFFER_EXPIRED: 409,
   OVER_RECEIVE: 409,
@@ -16,17 +19,20 @@ const STATUS_BY_REASON: Record<string, number> = {
 
 export async function registerDeliveryRoutes(app: FastifyInstance): Promise<void> {
   /**
-   * Shelter-rep endpoint: mark an offer's reserved stock as physically received.
-   *
-   * The donor shows up at the shelter front desk with the one-time code. The
-   * rep types it into the shelter dashboard. This call is intentionally
-   * idempotent at the row level (`deliveries.offer_id UNIQUE`) and at the
-   * status level (`offers.status = 'received'`).
-   *
-   * Authentication is by accountId in the body for the demo; production will
-   * replace this with a session cookie and a server-side lookup (DEV-09).
+   * Shelter-rep endpoint: mark an offer's reserved stock as physically
+   * received. Authentication comes from the session cookie set by
+   * POST /auth/login. The body only carries the human-readable code and the
+   * actual quantity — never an account id.
    */
   app.post('/deliveries', async (req, reply) => {
+    const account = await currentAccount(req);
+    if (!account) {
+      return reply.code(401).send({
+        error: 'NOT_AUTHENTICATED',
+        message: 'Войдите как представитель приюта.',
+      });
+    }
+
     const parsed = CreateDeliveryBodySchema.safeParse(req.body ?? {});
     if (!parsed.success) {
       return reply.code(400).send({
@@ -38,7 +44,7 @@ export async function registerDeliveryRoutes(app: FastifyInstance): Promise<void
     }
 
     const secret = req.server.env.SERVER_OFFER_SECRET;
-    const result = await createDelivery(parsed.data, secret);
+    const result = await createDelivery(parsed.data, account, secret);
 
     if (!result.ok) {
       return reply.code(STATUS_BY_REASON[result.reason] ?? 400).send({

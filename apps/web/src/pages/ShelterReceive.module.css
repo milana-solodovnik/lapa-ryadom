@@ -107,6 +107,36 @@
   text-decoration: underline;
 }
 
+.sessionBar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px 0 24px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: rgba(47, 122, 85, 0.06);
+  border: 1px solid rgba(47, 122, 85, 0.18);
+  font-size: 14px;
+}
+
+.sessionBar strong {
+  color: var(--color-text);
+}
+
+.sessionBar button {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text);
+  border: 0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sessionBar button:hover {
+  background: rgba(0, 0, 0, 0.10);
+}
+
 .success {
   margin-top: 24px;
   padding: 24px;

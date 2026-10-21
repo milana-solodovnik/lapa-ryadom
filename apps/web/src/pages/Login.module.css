@@ -1,0 +1,87 @@
+/* Login page (DEV-09). */
+
+.page {
+  max-width: 540px;
+  margin: 24px auto 64px;
+  padding: 0 24px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.form input {
+  font: inherit;
+  color: inherit;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.form input:focus {
+  outline: 2px solid rgba(47, 122, 85, 0.4);
+  outline-offset: 1px;
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(176, 58, 46, 0.1);
+  color: var(--color-danger);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  background: var(--color-accent-strong);
+  color: #fff;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions .secondary {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text);
+}
+
+.actions button[disabled] {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+details {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+details code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0 4px;
+  border-radius: 3px;
+}

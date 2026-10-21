@@ -34,10 +34,21 @@ export interface ShelterWithNeeds extends Shelter {
   needs: Need[];
 }
 
+export interface LoginPayload {
+  username: string;
+  password: string;
+}
+
+export interface SessionAccount {
+  id: string;
+  username: string;
+  role: 'admin' | 'shelter_rep';
+  shelterId: string | null;
+}
+
 export interface CreateDeliveryPayload {
   code: string;
   receivedQty: number;
-  accountId: string;
 }
 
 export interface DeliveryResult {
@@ -60,11 +71,10 @@ export interface DeliveryError {
 }
 
 export const REP_ACCOUNTS = [
-  // Demo seed: real authentication (DEV-09) will replace this with a session
-  // cookie and a server-side lookup.
-  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa01', label: 'rep_a — «Добрые лапы», Москва' },
-  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa02', label: 'rep_b — «Приют Северный», Москва' },
-  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa03', label: 'rep_c — «Спасение на юге», Омск' },
+  // Rep accounts for the demo login form. Their ids match db/seed/data.mjs.
+  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa01', username: 'rep_a', label: 'rep_a — «Добрые лапы», Москва' },
+  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa02', username: 'rep_b', label: 'rep_b — «Приют Северный», Москва' },
+  { id: 'aaaaaaaa-bbbb-4ccc-aaaa-aaaaaaaaaa03', username: 'rep_c', label: 'rep_c — «Спасение на юге», Омск' },
 ];
 
 export interface Paged<T> {

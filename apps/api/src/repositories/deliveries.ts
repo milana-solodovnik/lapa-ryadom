@@ -6,6 +6,7 @@ import {
   isWellFormed,
   normaliseCode,
 } from '../services/offer-code.js';
+import type { PublicAccount } from './auth.js';
 import type { CreateDeliveryBody } from '../schemas/deliveries.js';
 
 /**
@@ -43,13 +44,6 @@ export type CreateDeliveryResult =
       message: string;
       available?: string;
     };
-
-interface AccountRow {
-  id: string;
-  role: string;
-  shelter_id: string | null;
-  is_active: boolean;
-}
 
 interface OfferRow {
   id: string;
@@ -105,10 +99,28 @@ async function lockNeed(
 
 export async function createDelivery(
   body: CreateDeliveryBody,
+  acceptingAccount: PublicAccount,
   serverSecret: string
 ): Promise<CreateDeliveryResult> {
   const pool = getPool();
   if (!pool) throw new Error('DB pool is not configured');
+
+  // Defence-in-depth: the route already checked role/shelter, but re-assert
+  // here so a future caller that forgets the check still fails closed.
+  if (!acceptingAccount.isActive) {
+    return {
+      ok: false,
+      reason: 'ACCOUNT_INACTIVE',
+      message: 'Аккаунт деактивирован.',
+    };
+  }
+  if (acceptingAccount.role !== 'shelter_rep' || acceptingAccount.shelterId === null) {
+    return {
+      ok: false,
+      reason: 'WRONG_SHELTER',
+      message: 'Только представитель приюта может принять помощь.',
+    };
+  }
 
   // Pre-flight: malformed codes never touch the database.
   const normalised = normaliseCode(body.code);
@@ -124,39 +136,6 @@ export async function createDelivery(
   try {
     await client.query('BEGIN');
     const codeHash = hashOfferCode(normalised, serverSecret);
-
-    // Validate the accepting account.
-    const acct = await client.query<AccountRow>(
-      `SELECT id, role, shelter_id, is_active
-         FROM accounts
-        WHERE id = $1`,
-      [body.accountId]
-    );
-    const account = acct.rows[0];
-    if (!account) {
-      await client.query('ROLLBACK');
-      return {
-        ok: false,
-        reason: 'ACCOUNT_NOT_FOUND',
-        message: 'Аккаунт не найден.',
-      };
-    }
-    if (!account.is_active) {
-      await client.query('ROLLBACK');
-      return {
-        ok: false,
-        reason: 'ACCOUNT_INACTIVE',
-        message: 'Аккаунт деактивирован.',
-      };
-    }
-    if (account.role !== 'shelter_rep' || account.shelter_id === null) {
-      await client.query('ROLLBACK');
-      return {
-        ok: false,
-        reason: 'WRONG_SHELTER',
-        message: 'Только представитель приюта может принять помощь.',
-      };
-    }
 
     // Lock the offer row.
     const offer = await lockOfferByCode(client, codeHash);
@@ -227,7 +206,7 @@ export async function createDelivery(
         message: 'Потребность, к которой относится код, больше не существует.',
       };
     }
-    if (need.shelter_id !== account.shelter_id) {
+    if (need.shelter_id !== acceptingAccount.shelterId) {
       await client.query('ROLLBACK');
       return {
         ok: false,
@@ -260,7 +239,7 @@ export async function createDelivery(
       await client.query(
         `INSERT INTO deliveries (id, offer_id, received_qty, accepted_by)
          VALUES ($1, $2, $3, $4)`,
-        [deliveryId, offer.id, body.receivedQty, account.id]
+        [deliveryId, offer.id, body.receivedQty, acceptingAccount.id]
       );
     } catch (err) {
       const code = (err as { code?: string }).code;
