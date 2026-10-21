@@ -164,3 +164,35 @@ button {
   font-size: 13px;
   color: var(--color-muted);
 }
+
+.code-panel {
+  margin: 20px 0 28px;
+  padding: 28px 24px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius);
+}
+
+.code-value {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--color-text);
+}
+
+.code-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.steps {
+  padding-left: 22px;
+  color: var(--color-text);
+}
+
+.steps li {
+  margin-bottom: 6px;
+}

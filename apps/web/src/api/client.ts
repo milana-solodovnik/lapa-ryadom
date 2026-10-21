@@ -63,3 +63,46 @@ export function fetchShelters(params: { city?: string } = {}, signal?: AbortSign
 export function fetchShelter(id: string, signal?: AbortSignal) {
   return request<ShelterWithNeeds>(`/shelters/${id}`, { signal });
 }
+
+export interface CreateOfferPayload {
+  needId: string;
+  quantity: number;
+  idempotencyKey: string;
+}
+
+export interface OfferResult {
+  offerId: string;
+  code: string;
+  expiresAt: string;
+  remaining: string;
+  need: { id: string; title: string; unit: string };
+  notice: string;
+}
+
+export async function createOffer(payload: CreateOfferPayload): Promise<OfferResult> {
+  return request<OfferResult>('/offers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * UUIDv4 for the idempotency key.
+ * crypto.randomUUID is unavailable on insecure origins in some browsers, so
+ * fall back to getRandomValues rather than depending on a secure context.
+ */
+export function newIdempotencyKey(): string {
+  const c: Crypto | undefined = globalThis.crypto;
+  if (c && typeof c.randomUUID === 'function') {
+    return c.randomUUID();
+  }
+  if (!c || typeof c.getRandomValues !== 'function') {
+    throw new Error('Криптографический генератор недоступен в этом браузере');
+  }
+  const bytes = c.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}

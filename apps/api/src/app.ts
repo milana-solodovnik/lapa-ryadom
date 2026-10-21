@@ -5,9 +5,17 @@ import { loadEnv, type AppEnv } from './config/env.js';
 import { registerHealthRoutes } from './routes/health.js';
 import { registerDbDiagnosticsRoutes } from './routes/db-diagnostics.js';
 import { registerCatalogRoutes } from './routes/catalog.js';
+import { registerOfferRoutes } from './routes/offers.js';
 
 export interface BuildAppOptions {
   env?: AppEnv;
+}
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    /** Resolved configuration, injected so routes and tests share one source. */
+    env: AppEnv;
+  }
 }
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -25,6 +33,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     trustProxy: false,
   });
 
+  // Decorating here is what makes the offer-code secret injectable. Reading it
+  // via loadEnv() inside a route would silently bypass the injected config.
+  app.decorate('env', env);
+
   await app.register(cors, {
     origin: env.WEB_ORIGIN,
     credentials: true,
@@ -37,6 +49,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(registerHealthRoutes, { prefix: '/api/v1' });
   await app.register(registerDbDiagnosticsRoutes, { prefix: '/api/v1' });
   await app.register(registerCatalogRoutes, { prefix: '/api/v1' });
+  await app.register(registerOfferRoutes, { prefix: '/api/v1' });
 
   app.setNotFoundHandler((_req, reply) => {
     void reply.code(404).send({ error: 'NOT_FOUND', message: 'Route not found' });

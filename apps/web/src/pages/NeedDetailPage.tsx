@@ -1,5 +1,6 @@
-import { Link, useParams } from 'react-router-dom';
-import { fetchNeed } from '../api/client.js';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { fetchNeed, createOffer, newIdempotencyKey, ApiError } from '../api/client.js';
 import { useAsync } from '../api/useAsync.js';
 import { categoryLabel, unitLabel } from '../api/types.js';
 import styles from '../features/needs/Needs.module.css';
@@ -10,10 +11,15 @@ function formatQty(value: string): string {
 
 export function NeedDetailPage(): JSX.Element {
   const { needId } = useParams<{ needId: string }>();
+  const navigate = useNavigate();
   const { data: need, loading, error } = useAsync(
     (signal) => fetchNeed(needId as string, signal),
     [needId]
   );
+
+  const [quantity, setQuantity] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [offerError, setOfferError] = useState<string | null>(null);
 
   if (loading) return <p>Загрузка…</p>;
   if (error) return <div className={styles.error}>Не удалось загрузить: {error}</div>;
@@ -22,6 +28,27 @@ export function NeedDetailPage(): JSX.Element {
   const urgent = need.priority === 'urgent';
   const available = BigInt(need.availableQty);
   const soldOut = available === 0n;
+
+  const submit = async (): Promise<void> => {
+    setSubmitting(true);
+    setOfferError(null);
+    try {
+      const result = await createOffer({
+        needId: need.id,
+        quantity,
+        // Generated once per attempt; a double click or a network retry with
+        // the same key can never create two reservations.
+        idempotencyKey: newIdempotencyKey(),
+      });
+      navigate('/offer/result', {
+        state: { code: result.code, quantity, needTitle: need.title, expiresAt: result.expiresAt },
+      });
+    } catch (err) {
+      setOfferError(err instanceof ApiError ? err.message : 'Не удалось отправить заявку');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section>
@@ -76,20 +103,25 @@ export function NeedDetailPage(): JSX.Element {
               </p>
             ) : (
               <>
-                <label htmlFor="qty">Сколько вы можете привезти?</label>
+                <label htmlFor="qty">
+                  Сколько вы можете привезти? Свободно {formatQty(need.availableQty)}{' '}
+                  {unitLabel(need.unit)}
+                </label>
                 <div className="offer-cta-row">
                   <input
                     id="qty"
                     type="number"
                     min={1}
-                    max={Number(need.availableQty)}
-                    defaultValue={1}
+                    max={Number(available)}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
                   />
                   <span>{unitLabel(need.unit)}</span>
-                  <button type="button" disabled title="Появится в DEV-07">
-                    Предложить помощь
+                  <button type="button" onClick={() => void submit()} disabled={submitting}>
+                    {submitting ? 'Отправляем…' : 'Предложить помощь'}
                   </button>
                 </div>
+                {offerError && <div className={styles.error}>{offerError}</div>}
                 <p className="offer-hint">
                   Регистрация не нужна. Вы получите одноразовый код, который покажете в приюте.
                 </p>
