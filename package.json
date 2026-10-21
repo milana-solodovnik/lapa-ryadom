@@ -16,7 +16,8 @@
     "dev:web": "npm run -w apps/web dev",
     "test": "npm run -w apps/api test",
     "lint": "npm run -w apps/api lint && npm run -w apps/web lint",
-    "db:up": "node scripts/start-pg.mjs",
+    "db:up": "pwsh -NoProfile -File scripts/start-pg-detached.ps1",
+    "db:up:fg": "node scripts/start-pg.mjs",
     "db:down": "node scripts/stop-pg.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "node scripts/seed.mjs"

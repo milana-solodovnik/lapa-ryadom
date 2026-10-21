@@ -108,3 +108,59 @@ button {
     margin-right: 12px;
   }
 }
+
+/* ---- Public catalog layout (DEV-06) ---- */
+
+.needs-grid,
+.shelter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.shelter-list {
+  grid-template-columns: 1fr;
+}
+
+.offer-cta {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.offer-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 6px;
+  flex-wrap: wrap;
+}
+
+.offer-cta input[type='number'] {
+  width: 96px;
+  height: 38px;
+  padding: 0 10px;
+  font: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.offer-cta button {
+  height: 38px;
+  padding: 0 18px;
+  color: #fff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: 8px;
+}
+
+.offer-cta button:disabled {
+  background: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.offer-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}

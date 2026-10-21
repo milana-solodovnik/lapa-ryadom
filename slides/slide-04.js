@@ -1,5 +1,6 @@
-// Slide 4 -- Content / Image Showcase: live demo, with screenshot placeholders.
-// The two frames must be replaced by real captures after DEV-06.
+// Slide 4 -- Content / Image Showcase: live demo, with real captured screens.
+// Screenshots are produced by scripts/capture-screenshots.ps1 against the
+// running dev stack (API 4000, web 5173) using headless Chrome at 1280x900.
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
   slide.background = { color: theme.bg };
@@ -7,53 +8,40 @@ function createSlide(pres, theme) {
   addPageBadge(pres, slide, theme, 4);
 
   slide.addText('Живая демонстрация', {
-    x: 0.6, y: 0.36, w: 6.0, h: 0.55, margin: 0,
-    fontFace: 'Georgia', fontSize: 30, bold: true, color: theme.primary
+    x: 0.6, y: 0.3, w: 6.0, h: 0.52, margin: 0,
+    fontFace: 'Georgia', fontSize: 28, bold: true, color: theme.primary
   });
-  slide.addText('Сценарий D0 -> D1 -> D2 на одном экране', {
-    x: 0.6, y: 0.94, w: 6.0, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 13, color: theme.secondary
-  });
-
-  // Warning tag: neutral on-slide wording, production detail moved to speaker notes.
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 6.72, y: 0.42, w: 2.68, h: 0.62, fill: { color: theme.secondary }
-  });
-  slide.addText('Показ идёт в двух окнах браузера', {
-    x: 6.84, y: 0.46, w: 2.44, h: 0.54, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.bg
+  slide.addText('Публичная часть: без регистрации, счётчики пересчитываются автоматически', {
+    x: 0.6, y: 0.84, w: 6.6, h: 0.26, margin: 0,
+    fontFace: 'Calibri', fontSize: 12.5, color: theme.secondary
   });
 
-  // ---- Frame A: public window ----
-  addFrame(pres, slide, theme, 0.6, 1.32, 4.28, 2.72, 'ОКНО A -- ПУБЛИЧНОЕ');
-  slide.addText([
-    { text: '1.  Каталог: город, категория, поиск', options: { breakLine: true } },
-    { text: '2.  Карточка потребности и счётчики', options: { breakLine: true } },
-    { text: '3.  Кнопка "Предложить помощь"', options: { breakLine: true } },
-    { text: '4.  Ввод количества 5, получение кода', options: { breakLine: true } },
-    { text: '5.  Итог: обещано 5, получено 0, свободно 15', options: { bold: true } }
-  ], {
-    x: 0.78, y: 2.62, w: 3.92, h: 1.32, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.primary, paraSpaceAfter: 3
+  // Real capture, 1280x900 -> aspect 1.4222
+  const IMG_W = 3.86;
+  const IMG_H = IMG_W / (1280 / 900);
+  const HEAD_H = 0.3;
+  const FRAME_W = 4.0;
+
+  addShot(pres, slide, theme, 0.62, 1.28, FRAME_W, 'ОКНО A -- КАТАЛОГ ПОТРЕБНОСТЕЙ',
+    'screenshots/needs-catalog.png',
+    'Фильтры по городу, категории и приоритету; поиск; пагинация. Каждая карточка показывает требуется, обещано, получено и свободно.');
+
+  addShot(pres, slide, theme, 5.38, 1.28, FRAME_W, 'КАРТОЧКА ПОТРЕБНОСТИ',
+    'screenshots/need-detail.png',
+    'Адрес и часы приёма. Посетитель называет посильное количество и получает одноразовый код -- без аккаунта и телефона.');
+
+  // Captions under the frames
+  [0.62, 5.38].forEach(function (x) {
+    slide.addText('', {
+      x: x, y: 1.28 + HEAD_H + IMG_H + 0.04, w: FRAME_W, h: 0.001, margin: 0
+    });
   });
 
-  // ---- Frame B: shelter cabinet ----
-  addFrame(pres, slide, theme, 5.12, 1.32, 4.28, 2.72, 'ОКНО B -- КАБИНЕТ ПРИЮТА');
-  slide.addText([
-    { text: '1.  Вход представителя приюта', options: { breakLine: true } },
-    { text: '2.  Свои потребности, включая закрытые', options: { breakLine: true } },
-    { text: '3.  Экран подтверждения по коду', options: { breakLine: true } },
-    { text: '4.  Фактически получено 3, подтвердить', options: { breakLine: true } },
-    { text: '5.  Итог: обещано 0, получено 3, свободно 17', options: { bold: true } }
-  ], {
-    x: 5.3, y: 2.62, w: 3.92, h: 1.32, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.primary, paraSpaceAfter: 3
-  });
-
-  // ---- Control points strip ----
+  // Control points strip
+  const stripY = 1.28 + HEAD_H + IMG_H + 0.12;
   slide.addText('КОНТРОЛЬНЫЕ ТОЧКИ НА ЭКРАНЕ', {
-    x: 0.6, y: 4.2, w: 4.0, h: 0.26, margin: 0,
-    fontFace: 'Calibri', fontSize: 10, color: theme.primary, charSpacing: 1.2, bold: true
+    x: 0.62, y: stripY, w: 5.0, h: 0.24, margin: 0,
+    fontFace: 'Calibri', fontSize: 9.5, color: theme.primary, charSpacing: 1.2, bold: true
   });
 
   const pts = [
@@ -62,68 +50,54 @@ function createSlide(pres, theme) {
     { code: 'D2', nums: '20 / 0 / 3 / 17' }
   ];
   pts.forEach(function (p, i) {
-    const x = 0.6 + i * 2.5;
+    const x = 0.62 + i * 2.46;
     slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 4.5, w: 2.28, h: 0.6, fill: { color: theme.light }
+      x: x, y: stripY + 0.28, w: 2.26, h: 0.58, fill: { color: theme.light }
     });
     slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 4.5, w: 0.44, h: 0.6, fill: { color: theme.primary }
+      x: x, y: stripY + 0.28, w: 0.44, h: 0.58, fill: { color: theme.primary }
     });
     slide.addText(p.code, {
-      x: x, y: 4.5, w: 0.44, h: 0.6, margin: 0, align: 'center', valign: 'middle',
+      x: x, y: stripY + 0.28, w: 0.44, h: 0.58, margin: 0, align: 'center', valign: 'middle',
       fontFace: 'Georgia', fontSize: 13, bold: true, color: theme.bg
     });
     slide.addText('требуется / обещано / получено / свободно', {
-      x: x + 0.54, y: 4.56, w: 1.68, h: 0.2, margin: 0,
-      fontFace: 'Calibri', fontSize: 7.5, color: theme.secondary
+      x: x + 0.52, y: stripY + 0.33, w: 1.7, h: 0.18, margin: 0,
+      fontFace: 'Calibri', fontSize: 7, color: theme.secondary
     });
     slide.addText(p.nums, {
-      x: x + 0.54, y: 4.75, w: 1.68, h: 0.3, margin: 0,
-      fontFace: 'Georgia', fontSize: 14, bold: true, color: theme.primary
+      x: x + 0.52, y: stripY + 0.51, w: 1.7, h: 0.3, margin: 0,
+      fontFace: 'Georgia', fontSize: 13.5, bold: true, color: theme.primary
     });
   });
 
-  slide.addText('После D2 обновить публичную страницу -- это доказывает, что данные сохранились.', {
-    x: 8.12, y: 4.5, w: 1.28, h: 0.6, margin: 0,
-    fontFace: 'Calibri', fontSize: 8.5, color: theme.secondary
+  slide.addText('После D2 обновить публичную страницу -- это и есть доказательство, что данные сохранились.', {
+    x: 8.0, y: stripY + 0.28, w: 1.4, h: 0.58, margin: 0,
+    fontFace: 'Calibri', fontSize: 8, color: theme.secondary
   });
-
-  // Production instructions live in speaker notes, NOT on the audience-facing slide.
-  slide.addNotes([
-    'ЗАГОТОВКА СЛАЙДА. Перед выступлением заменить оба пунктирных кадра реальными',
-    'скриншотами работающего приложения (задача DEV-06). На сцене показывается живое',
-    'приложение, а не этот слайд -- см. docs/07_DEMO_AND_PITCH.md раздел 2, слайд 4.',
-    '',
-    'Требования к кадрам: ширина 1280 px, масштаб браузера 110-125%, отключены',
-    'уведомления, нет личных вкладок и отладочных панелей, пароли на экране не видны.',
-    '',
-    'Окно A (публичное): каталог -> карточка потребности -> предложить помощь -> код.',
-    'Окно B (кабинет приюта): заранее авторизованный представитель "Добрые лапы" ->',
-    'экран подтверждения по коду.',
-    '',
-    'Исходное состояние перед показом: требуется 20 / обещано 0 / получено 0 / свободно 20.',
-    'Сброс демоданных делать ДО выхода на сцену, не на сцене.'
-  ].join('\n'));
 
   return slide;
 }
 
-function addFrame(pres, slide, theme, x, y, w, h, label) {
+function addShot(pres, slide, theme, x, y, frameW, headerLabel, imagePath, caption) {
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: x, y: y, w: w, h: h,
-    fill: { color: theme.bg },
-    line: { color: theme.secondary, width: 1.25, dashType: 'dash' }
+    x: x, y: y, w: frameW, h: 0.3, fill: { color: theme.secondary }
   });
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: x, y: y, w: w, h: 0.32, fill: { color: theme.secondary }
+  slide.addText(headerLabel, {
+    x: x + 0.12, y: y, w: frameW - 0.24, h: 0.3, margin: 0, valign: 'middle',
+    fontFace: 'Calibri', fontSize: 9, bold: true, color: theme.bg, charSpacing: 0.6
   });
-  slide.addText(label, {
-    x: x + 0.12, y: y, w: w - 0.24, h: 0.32, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 10, bold: true, color: theme.bg, charSpacing: 0.8
+
+  const imgW = frameW - 0.14;
+  const imgH = imgW / (1280 / 900);
+  slide.addImage({
+    path: imagePath,
+    x: x + 0.07, y: y + 0.32, w: imgW, h: imgH
   });
-  slide.addText('Кадр приложения', {
-    x: x, y: y + 0.85, w: w, h: 0.4, margin: 0, align: 'center',
-    fontFace: 'Georgia', fontSize: 14, bold: true, color: theme.secondary
+
+  slide.addText(caption, {
+    x: x + 0.02, y: y + 0.36 + imgH, w: frameW - 0.04, h: 0.42, margin: 0,
+    fontFace: 'Calibri', fontSize: 8, color: theme.secondary
   });
 }
 

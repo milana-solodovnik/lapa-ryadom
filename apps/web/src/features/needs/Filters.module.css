@@ -1,0 +1,91 @@
+/* Filter bar for the needs catalog. */
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 16px;
+  margin-bottom: 20px;
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: var(--radius);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--color-muted);
+}
+
+.input,
+.select {
+  height: 38px;
+  padding: 0 10px;
+  min-width: 160px;
+  font: inherit;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.select {
+  min-width: 170px;
+  cursor: pointer;
+}
+
+.input:focus,
+.select:focus {
+  outline: 2px solid rgba(47, 122, 85, 0.35);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+.reset {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-muted);
+}
+
+.reset:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.summary {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--color-muted);
+}
+
+.summary strong {
+  color: var(--color-text);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.pager button {
+  padding: 8px 16px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.pager button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
