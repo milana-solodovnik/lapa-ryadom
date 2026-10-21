@@ -43,6 +43,21 @@ test-results/
 # Demo video / screenshots
 demo-assets/raw/
 
+# Local scratch / commit message drafts
+.commit-msg-*.txt
+*.swp
+*.tmp
+
+# Slide QA render artifacts (LibreOffice output)
+slides/qa-render/
+
+# Digital Q.DataBase distribution / data dir
+infra/qdb-dist/
+infra/qdb-data/
+
+# Local screenshots captured for the pitch deck
+slides/screenshots/
+
 # Don't commit seeded real DB dumps
 *.dump
 *.sql.gz
