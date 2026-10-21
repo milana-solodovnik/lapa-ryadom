@@ -30,6 +30,7 @@ async function main() {
     port,
     host,
     persistent: true,
+    initdbFlags: ['--no-locale', '--encoding=UTF8'],
   });
 
   const log = (msg, extra) => {
@@ -41,7 +42,7 @@ async function main() {
   const alreadyInitialised = existsSync(path.join(dataDir, 'PG_VERSION'));
   if (!alreadyInitialised) {
     log('initialising cluster', { dataDir });
-    await pg.initialise();
+    await pg.initialise({ encoding: 'UTF8' });
     log('initialised', { dataDir });
   } else {
     log('cluster already initialised, reusing', { dataDir });

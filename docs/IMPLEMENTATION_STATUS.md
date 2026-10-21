@@ -80,10 +80,44 @@
 - **Файлы данных:** `.pg-runtime/data/` (в `.gitignore`). Удаление папки = чистая инициализация с нуля.
 - **Следующая задача:** DEV-03 — реальные миграции `db/migrations/*.sql` и исполнитель `scripts/migrate.mjs`.
 
-### DEV-03 — миграция схемы (`PENDING`)
+### DEV-03 — миграция схемы (`DONE`)
 
-- Файлы `db/migrations/001_initial.sql` и `002_auth_sessions.sql` — точная копия SQL из `03_DATA_MODEL.md` §4.
-- `scripts/migrate.mjs` — реальный исполнитель с `schema_migrations`.
+- **Статус:** `DONE`. Пять таблиц, представление `need_balances`, `auth_sessions`, индексы имитируют `03_DATA_MODEL.md` §4–5 и `04_TECHNICAL_ARCHITECTURE.md` §3.2.
+- **Файлы:**
+  - `db/migrations/001_initial.sql` — `shelters`, `accounts`, `needs`, `offers`, `deliveries`, все индексы из §4, представление `need_balances` из §5.
+  - `db/migrations/002_auth_sessions.sql` — `auth_sessions(id_hash PK, account_id, csrf_token, created_at, expires_at, revoked_at)` с проверками размера `BYTEA` (32 байта) и `auth_sessions_revoke_ck`, индексы на `account_id` и активные сессии.
+  - `scripts/migrate.mjs` — использует `pg.Client`, ведёт учёт в `schema_migrations(name, checksum, applied_at)`, файл-чексума FNV-1a (32-бит), идемпотентен; каждая миграция в собственной транзакции с rollback при ошибке.
+- **Проверено (реальные команды, PASS):**
+  - `node scripts/migrate.mjs` (первый запуск) → `apply 001_initial.sql; apply 002_auth_sessions.sql; done. 2 applied, 0 already applied.`
+  - `node scripts/migrate.mjs` (второй запуск) → `skip 001…; skip 002…; done. 0 applied, 2 already applied.` (идемпотентность подтверждена).
+  - `node scripts/verify-schema.mjs` показал:
+    - `TABLES`: accounts, auth_sessions, deliveries, need_balances, needs, offers, schema_migrations, shelters
+    - `VIEWS`: need_balances
+    - `MIGRATIONS`: 001_initial.sql, 002_auth_sessions.sql, обе с временем применения.
+    - `NEED_BALANCES COLUMNS`: need_id uuid, target_qty bigint, reserved_qty bigint, received_qty bigint, available_qty bigint.
+    - `SELECT FROM needs`: rowCount 0 (ожидаемо, до seed).
+- **Найденные и устранённые дефекты:**
+  1. PowerShell не позволил сразу гонять проверочные `node -e` из-за `\-escape`. Перевёл проверку в `scripts/verify-schema.mjs` — переиспользуемый артефакт, остаётся в репозитории.
+  2. После остановки API в прошлом раунде упал и PostgreSQL. Поняли: `npm run dev` без отдельного окна для БД не выживает; `start-pg.mjs` оставлен отдельным процессом — намеренно.
+### DEV-04 — idem-potентный seed (`DONE`)
+
+- **Статус:** `DONE`. Демо-набор заполнен и проверен, повторный запуск — no-op.
+- **Файлы:**
+  - `db/seed/data.mjs` — 3 приюта (Добрые лапы, Приют Северный, Спасение на юге), 10 потребностей (по 3–4 на приют, категории `food`, `hygiene`, `textile`, `equipment`, `carriers`, `other`, приоритеты `urgent` / `normal`), 4 учётки (`admin`, `rep_a`, `rep_b`, `rep_c`).
+  - `scripts/seed.mjs` — Argon2id-хеш паролей через `argon2.hash(…, {type: argon2.argon2id})`, идемпотентен: на повторе короткое сообщение `already seeded`. `--reset` — TRUNCATE таблиц `deliveries, offers, needs, accounts, shelters, auth_sessions` перед вставкой.
+  - `scripts/verify-schema.mjs` (DEV-03) и `scripts/verify-encoding.mjs` (DEV-04): вспомогательные диагностические ассерты.
+  - `scripts/verify-seed.mjs` — печатает содержимое и проверяет `argon2.verify()` для пароля администратора.
+- **Проверено (реальные команды, PASS):**
+  - `node scripts/seed.mjs` → `[db:seed] OK: 3 shelters, 4 accounts, 10 needs.`
+  - `node scripts/verify-seed.mjs` → распечатал все 3 приюта (на русском), 4 аккаунта, 10 потребностей и **10 строк `need_balances`** с `target_qty == available_qty` и нулями в `reserved_qty / received_qty` (свежее состояние). Завершающая строка: `admin password verify: true`.
+  - `node scripts/seed.mjs` повторно → `[db:seed] already seeded (shelters > 0); nothing to do.` Идемпотентность подтверждена.
+  - `node scripts/migrate.mjs` повторно → оба файла `skip …`. Идемпотентность миграций подтверждена.
+  - `node scripts/verify-encoding.mjs` → `server_encoding: UTF8`, `roundtrip: "Привет, мир! Лапа рядом 🐾"`.
+- **Найденные и устранённые дефекты:**
+  1. Стартовый кластер `embedded-postgres` инициализировался с `WIN1252` (Windows Russian locale) — кириллица уходила в ошибку `0xd0 0x94 has no equivalent in encoding "WIN1252"`. Изменил `start-pg.mjs`: передаём `initdbFlags: ['--no-locale', '--encoding=UTF8']` через API `embedded-postgres`, после чего initdb создаёт кластер с `server_encoding=UTF8`. Это компромисс по сравнению с русской локалью, но `need_balances` и сравнения на равенство строк работают корректно; полнотекстовая сортировка и индексация по русскому тексту в MVP не используются (см. `03_DATA_MODEL.md` §3 — текстовые поля не семантические).
+  2. Двойной апостроф `Hill''s` в JS-строке ломает парсер. Заменил на двойные кавычки.
+  3. `import()` со ссылкой на абсолютный Windows-путь падал `ERR_UNSUPPORTED_ESM_URL_SCHEME`. Привёл к `pathToFileURL().href`.
+- **Следующая задача:** DEV-05 — публичные read-only ручки `/shelters`, `/shelters/:id`, `/needs` (с фильтрами по категории/городу/поиску).
 
 ### DEV-04 — seed (`PENDING`)
 
