@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Build output
+dist/
+build/
+.vite/
+.next/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment / secrets — never commit
+.env
+.env.local
+.env.*.local
+*.pem
+data/
+.pgdata/
+
+# Embedded PostgreSQL runtime artifacts
+.pg-runtime/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Test artifacts
+coverage/
+playwright-report/
+playwright/.cache/
+test-results/
+
+# Demo video / screenshots
+demo-assets/raw/
+
+# Don't commit seeded real DB dumps
+*.dump
+*.sql.gz

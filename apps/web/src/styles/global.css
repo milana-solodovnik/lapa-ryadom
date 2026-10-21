@@ -1,0 +1,110 @@
+:root {
+  --color-bg: #f7f5ef;
+  --color-surface: #ffffff;
+  --color-text: #1f1d18;
+  --color-muted: #6a6557;
+  --color-accent: #2f7a55;
+  --color-accent-strong: #1f5b3f;
+  --color-danger: #b03a2e;
+  --color-warning: #c0871a;
+  --color-success: #2f7a55;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.06);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--color-accent-strong);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 24px;
+  background: var(--color-surface);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.app-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 20px;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.app-nav-link {
+  margin-left: 16px;
+  text-decoration: none;
+  color: var(--color-muted);
+  padding: 6px 8px;
+  border-radius: var(--radius);
+}
+
+.app-nav-link.active {
+  color: var(--color-text);
+  background: rgba(47, 122, 85, 0.12);
+}
+
+.demo-banner {
+  padding: 8px 24px;
+  background: rgba(192, 135, 26, 0.16);
+  color: #5d4310;
+  font-size: 13px;
+  text-align: center;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.app-footer {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-nav-link {
+    margin-left: 0;
+    margin-right: 12px;
+  }
+}
