@@ -46,6 +46,11 @@ afterAll(async () => {
 /** Return a need to its pristine D0 state so each test is independent. */
 async function resetNeed(needId = NEED_URGENT): Promise<void> {
   const pool = getPool()!;
+  // The deliveries test shares the dev DB and may leave child rows behind.
+  await pool.query(
+    `DELETE FROM deliveries WHERE offer_id IN (SELECT id FROM offers WHERE need_id = $1)`,
+    [needId]
+  );
   await pool.query('DELETE FROM offers WHERE need_id = $1', [needId]);
 }
 

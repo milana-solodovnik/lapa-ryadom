@@ -1,4 +1,11 @@
-import type { Need, Paged, Shelter, ShelterWithNeeds } from './types.js';
+import type {
+  CreateDeliveryPayload,
+  DeliveryResult,
+  Need,
+  Paged,
+  Shelter,
+  ShelterWithNeeds,
+} from './types.js';
 
 const BASE = '/api/v1';
 
@@ -81,6 +88,14 @@ export interface OfferResult {
 
 export async function createOffer(payload: CreateOfferPayload): Promise<OfferResult> {
   return request<OfferResult>('/offers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createDelivery(payload: CreateDeliveryPayload): Promise<DeliveryResult> {
+  return request<DeliveryResult>('/deliveries', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

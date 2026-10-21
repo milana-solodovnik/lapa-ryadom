@@ -6,6 +6,7 @@ import { registerHealthRoutes } from './routes/health.js';
 import { registerDbDiagnosticsRoutes } from './routes/db-diagnostics.js';
 import { registerCatalogRoutes } from './routes/catalog.js';
 import { registerOfferRoutes } from './routes/offers.js';
+import { registerDeliveryRoutes } from './routes/deliveries.js';
 
 export interface BuildAppOptions {
   env?: AppEnv;
@@ -50,6 +51,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(registerDbDiagnosticsRoutes, { prefix: '/api/v1' });
   await app.register(registerCatalogRoutes, { prefix: '/api/v1' });
   await app.register(registerOfferRoutes, { prefix: '/api/v1' });
+  await app.register(registerDeliveryRoutes, { prefix: '/api/v1' });
 
   app.setNotFoundHandler((_req, reply) => {
     void reply.code(404).send({ error: 'NOT_FOUND', message: 'Route not found' });
