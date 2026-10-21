@@ -47,6 +47,7 @@ demo-assets/raw/
 .commit-msg-*.txt
 *.swp
 *.tmp
+.status-append-*.md
 
 # Slide QA render artifacts (LibreOffice output)
 slides/qa-render/

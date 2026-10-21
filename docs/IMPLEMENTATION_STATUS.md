@@ -507,3 +507,79 @@
 - **Ожидается от Евгения:** скачанный архив в `F:\MVP\hakaton\infra\qdb-dist\`
   (файл вида `docker-qdatabase64xid-17-*.tar.gz`, ~1,5 ГБ) и ответ «готово».
 - **Срок:** приём конкурсных проектов — 21 октября 2026 года, то есть сегодня.
+### Сессия 21.10.2026 (после «ставь WSL2») — DEV-08, слайд 4, Docker-образ QDB
+
+**Что сделано:**
+
+1. **DEV-08 `POST /api/v1/deliveries`** (коммит `edba64c`):
+   - `schemas/deliveries.ts`, `repositories/deliveries.ts`, `routes/deliveries.ts`,
+     `test/deliveries.test.ts` — 14 интеграционных тестов: happy path, well-formed
+     code, 404 unknown code, 404 unknown account, 403 admin, 403 wrong shelter,
+     over-receive, double-deliver, expired, cancelled, non-positive & fractional
+     qty, partial receipt, per-shelter independence, конкурентные rep-ы.
+   - Бизнес-правила: HMAC-SHA256 от нормализованного кода, `SELECT ... FOR UPDATE`
+     по offer-строке, проверки статуса и срока, `accounts` блокируется неявно,
+     `deliveries.offer_id UNIQUE` — резерв от двойной вставки.
+   - Тесты: 46/46 (smoke 2 + catalog 16 + offers 14 + deliveries 14).
+   - `vitest.config.ts` в `apps/api/`: `pool: 'forks'`, `singleFork: true`,
+     `fileParallelism: false` — общая dev-БД не переносит параллельный запуск.
+   - Web: `apps/web/src/pages/ShelterReceivePage.tsx` — форма выбора `rep`,
+     поля «код» и «принято фактически», состояния «ожидание → успех». CSS-модуль
+     `ShelterReceive.module.css`.
+   - Скриншоты D1 и D2: `screenshots/needs-catalog-d1.png`, `needs-catalog-d2.png`,
+     `shelter-receive-empty.png`.
+
+2. **Слайд 4 пересобран** (коммит `fe9676f`):
+   - Заголовок «Живая демонстрация», подзаголовок со сценарием.
+   - 4 мини-кадра в ряд: D0 baseline, D1 после 3 заявок, форма приёма,
+     D2 после приёмки. Цифры в D1 действительно «обещано 5/8/12», в D2 —
+     «получено 5/0, обещано 0/8/12». Балансная полоса D0/D1/D2 под кадрами
+     с пометкой о `need_balances`.
+   - QA dump: PASS по canvas bounds / page badges / placeholders / key facts.
+
+3. **QDB-01 (Docker-образ скачан)**:
+   - Пользователь передал прямую ссылку с ключом. Без `&file=1` сервер
+     возвращает HTML-страницу «Скачивание начнётся автоматически…» с JS-редиректом.
+     С `&file=1` — `application/octet-stream`, `Accept-Ranges: bytes`.
+   - Файл `infra/qdb-dist/docker-digital-q-database64xid-18-18.2.26061101-ubuntu22_x86_64.tar.gz`,
+     **1 273 750 512 байт** — побайтно совпадает с `Content-Length` HTTP-ответа.
+   - Целостность: gzip-magic `1f 8b 08 00`, `tar -tzf` распаковывает дерево дистрибутива.
+   - `README_DOCKER.txt`: `docker load -i ...`, `docker run -d -p 5439:5432 -p 1439:1433
+     -p 1529:1521`. Мастер переноса БД способен мигрировать из MS SQL, Oracle
+     **и PostgreSQL** (наш эталон подходит как источник).
+
+4. **WSL2 установлен (нужен ребут для активации)**:
+   - `scripts/install-wsl2.ps1` идемпотентный, запущен elevated.
+   - `Microsoft-Windows-Subsystem-Linux` и `VirtualMachinePlatform` включены.
+   - `wsl --install --no-distribution` установил WSL **3.0.3** MSI-пакетом в
+     `C:\Program Files\WSL\`. Внутри `wslservice.exe`, `wsl.exe`, `kernel` 15,7 МБ,
+     `system.vhd` 758 МБ.
+   - `wslservice` зарегистрирован в SCM и уже RUNNING. **Не работает `wsl -l -v`** —
+     пишет «requires kernel» / «VMP включён, но требует перезагрузки». Это режим
+     ядра Windows, на лету не поднимается.
+   - Сценарий после ребута: `wsl.exe status` покажет kernel OK →
+     `docker load -i infra/qdb-dist/_peek/.../docker-qdatabase-...tar.gz` →
+     `docker run -d` → QDB-02…QDB-05.
+   - Альтернативы на этом этапе нет: единственный серверный пакет Digital Q.DataBase
+     — это Docker; Windows-сервера у компании нет.
+
+**Что заблокировано:**
+
+- **QDB-02…05** — ждут ребута от Евгения.
+- **DEV-09** (cookie-аутентификация вместо `accountId` в теле) — форма приёма
+  работает; `LoginPage.tsx` есть, но провайдер не подключён.
+- **DEV-QA-01** — dedicated test-DB для параллельного прогона и CI.
+- **DEMO-01…05** — финальный сценарий выступления, видео-резерв.
+
+**Команды этой сессии:**
+
+- `curl --noproxy '*' -I '…&file=1'` → 200, octet-stream, 1 273 750 512 B.
+- `pwsh -File scripts/fetch-resumable.ps1` → 22 минуты, 965 КБ/с, лог
+  `infra/qdb-dist\wsl2-install.log`.
+- `sc query wslservice` → STATE: 4 RUNNING, LocalSystem.
+- `npx vitest run` в `apps/api/` → **46/46 PASS** (~3 секунды).
+- `node slides/compile.js` → pptx; `soffice --convert-to pdf`; `qa_dump.py` → 4/4 PASS.
+- `npx tsc -p apps/api/tsconfig.json --noEmit` → 0 ошибок.
+- `npx tsc -p apps/web/tsconfig.json --noEmit` → 0 ошибок.
+- `npx vite build` (из `apps/web/`) → индекс 0,5 КБ, css 5,5 КБ, js 226,8 КБ.
+
