@@ -1,0 +1,154 @@
+/* Shelter receive form (D2). Visual contract with screenshots/slide-04. */
+
+.page {
+  max-width: 720px;
+  margin: 24px auto 64px;
+  padding: 0 24px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: var(--color-text);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.muted.small {
+  font-size: 12px;
+}
+
+.form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form label > span {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form label > small {
+  font-size: 12px;
+}
+
+.form input,
+.form select,
+.form textarea {
+  font: inherit;
+  color: inherit;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+  outline: 2px solid rgba(47, 122, 85, 0.4);
+  outline-offset: 1px;
+}
+
+.form input[disabled],
+.form select[disabled] {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: rgba(176, 58, 46, 0.1);
+  color: var(--color-danger);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actions button {
+  background: var(--color-accent-strong);
+  color: #fff;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actions button[disabled] {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.actions a {
+  color: var(--color-muted);
+  text-decoration: underline;
+}
+
+.success {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: rgba(47, 122, 85, 0.08);
+  border: 1px solid rgba(47, 122, 85, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.success h2 {
+  margin: 0;
+  color: var(--color-accent-strong);
+}
+
+.success dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 18px;
+}
+
+.success dt {
+  color: var(--color-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.success dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+details {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+details code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0 4px;
+  border-radius: 3px;
+}

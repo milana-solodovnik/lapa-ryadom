@@ -6,6 +6,7 @@ import {
   REP_ACCOUNTS,
   unitLabel,
 } from '../api/types.js';
+import styles from './ShelterReceive.module.css';
 
 interface FormState {
   code: string;
@@ -74,10 +75,10 @@ export function ShelterReceivePage(): JSX.Element {
   }
 
   return (
-    <section className="receive-page">
-      <header>
+    <section className={styles.page}>
+      <header className={styles.header}>
         <h1>Принять помощь</h1>
-        <p className="muted">
+        <p className={styles.muted}>
           Шаг D2 сценария: даритель привёз помощь в приют. Введите код, который он получил на
           странице подтверждения. Код показывается один раз и записан как хеш, поэтому изменить
           решение «задним числом» через повторный ввод того же кода нельзя.
@@ -85,31 +86,23 @@ export function ShelterReceivePage(): JSX.Element {
       </header>
 
       {done && (
-        <article className="receive-success">
+        <article className={styles.success}>
           <h2>Принято ✓</h2>
           <dl>
-            <div>
-              <dt>Потребность</dt>
-              <dd>{done.needTitle}</dd>
-            </div>
-            <div>
-              <dt>Принято</dt>
-              <dd>
-                {done.receivedQty} {unitLabel(done.needUnit)} из {done.offerQty}{' '}
-                {unitLabel(done.needUnit)}
-              </dd>
-            </div>
-            <div>
-              <dt>Осталось по потребности</dt>
-              <dd>{done.remaining}</dd>
-            </div>
-            <div>
-              <dt>Время</dt>
-              <dd>{new Date(done.receivedAt).toLocaleString('ru-RU')}</dd>
-            </div>
+            <dt>Потребность</dt>
+            <dd>{done.needTitle}</dd>
+            <dt>Принято</dt>
+            <dd>
+              {done.receivedQty} {unitLabel(done.needUnit)} из {done.offerQty}{' '}
+              {unitLabel(done.needUnit)}
+            </dd>
+            <dt>Осталось по потребности</dt>
+            <dd>{done.remaining}</dd>
+            <dt>Время</dt>
+            <dd>{new Date(done.receivedAt).toLocaleString('ru-RU')}</dd>
           </dl>
-          <p className="muted">{done.notice}</p>
-          <div className="receive-actions">
+          <p className={styles.muted}>{done.notice}</p>
+          <div className={styles.actions}>
             <button type="button" onClick={anotherDelivery}>
               Принять ещё одну помощь
             </button>
@@ -119,7 +112,7 @@ export function ShelterReceivePage(): JSX.Element {
       )}
 
       {!done && (
-        <form onSubmit={onSubmit} className="receive-form">
+        <form onSubmit={onSubmit} className={styles.form}>
           <label>
             <span>Представитель приюта</span>
             <select
@@ -134,7 +127,7 @@ export function ShelterReceivePage(): JSX.Element {
                 </option>
               ))}
             </select>
-            <small className="muted">
+            <small className={styles.muted}>
               В рабочей версии — это cookie-сессия после логина (DEV-09).
             </small>
           </label>
@@ -153,8 +146,8 @@ export function ShelterReceivePage(): JSX.Element {
               disabled={submitting}
               required
             />
-            <small className="muted">
-              16 символов, латиница и цифры 2–9. Запятые и дефисы можно опустить.
+            <small className={styles.muted}>
+              16 символов, латиница и цифры 2–9. Дефисы можно опустить.
             </small>
           </label>
 
@@ -169,21 +162,21 @@ export function ShelterReceivePage(): JSX.Element {
               disabled={submitting}
               required
             />
-            <small className="muted">
+            <small className={styles.muted}>
               Не больше, чем было обещано. Можно меньше — например, привезли часть товара.
             </small>
           </label>
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
 
-          <div className="receive-actions">
+          <div className={styles.actions}>
             <button type="submit" disabled={submitting}>
               {submitting ? 'Принимаю…' : 'Подтвердить приём'}
             </button>
             <Link to="/">Отмена</Link>
           </div>
 
-          <p className="muted small">
+          <p className={`${styles.muted} ${styles.small}`}>
             Категория отображается на странице потребности:{' '}
             <Link to="/needs">весь каталог</Link>.
           </p>
