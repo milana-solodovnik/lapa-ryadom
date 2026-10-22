@@ -29,14 +29,25 @@ export type CreateOfferResult =
  * Recompute the live counters inside the transaction, using the same formula as
  * the need_balances view but evaluated against locked state.
  *
- * FOR UPDATE on the needs row serialises concurrent reservations for the same
- * need. Two visitors racing for the last pack therefore queue instead of both
- * succeeding, which is the behaviour docs/06_TEST_PLAN.md requires.
+ * The lock and the counting MUST be two separate statements. Under READ
+ * COMMITTED a blocking `SELECT ... FOR UPDATE` keeps the snapshot it started
+ * with: when the loser of a race unblocks, the correlated sub-selects in that
+ * same statement still read the state that was committed before the winner
+ * finished, so the loser sees free stock that is already gone and both
+ * reservations succeed. Splitting the statements means the count runs on a
+ * snapshot taken after we own the lock, i.e. after the previous holder
+ * committed.
+ *
+ * Verified by scripts/probe-fu-lock.mjs on both reference PostgreSQL 17.10
+ * and Digital Q.DataBase 18.2.
  */
 async function readNeedForUpdate(
   client: PoolClient,
   needId: string
 ): Promise<{ id: string; title: string; unit: string; status: string; available: string } | null> {
+  const locked = await client.query('SELECT id FROM needs WHERE id = $1 FOR UPDATE', [needId]);
+  if (locked.rows.length === 0) return null;
+
   const { rows } = await client.query<{
     id: string;
     title: string;

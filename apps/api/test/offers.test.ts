@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import type { FastifyInstance } from 'fastify';
 import { buildApp } from '../src/app.js';
 import { closePool, configurePool, getPool } from '../src/db/pool.js';
@@ -191,6 +191,52 @@ describe('POST /api/v1/offers', () => {
     expect(codes).toEqual([201, 409]);
 
     const pool = getPool()!;
+    const { rows } = await pool.query(
+      `SELECT COALESCE(SUM(o.quantity),0)::bigint AS reserved
+       FROM offers o WHERE o.need_id = $1 AND o.status = 'reserved'`,
+      [NEED_URGENT]
+    );
+    expect(rows[0].reserved).toBe('50');
+  });
+
+  it('refuses the loser of a race that committed while we waited for the lock', async () => {
+    // The test above relies on two injects happening to interleave. This one
+    // forces the overlap: we park a competing transaction directly on the need
+    // lock, so our request is guaranteed to block and then unblock *after* the
+    // winner committed. That is the window in which a stale statement snapshot
+    // would report free stock that is already gone.
+    await post({ needId: NEED_URGENT, quantity: 49, idempotencyKey: randomUUID() });
+
+    const pool = getPool()!;
+    const holder = await pool.connect();
+    let status = 0;
+
+    try {
+      // Holder owns the lock and stays inside its transaction.
+      await holder.query('BEGIN');
+      await holder.query('SELECT id FROM needs WHERE id = $1 FOR UPDATE', [NEED_URGENT]);
+
+      // Our request now starts and blocks on that lock.
+      const pending = post({ needId: NEED_URGENT, quantity: 1, idempotencyKey: randomUUID() });
+      await new Promise((r) => setTimeout(r, 250));
+
+      // The winner claims the last unit and releases the lock.
+      await holder.query(
+        `INSERT INTO offers (id, need_id, quantity, idempotency_key, code_hash, status, expires_at)
+         VALUES ($1, $2, 1, $3, $4, 'reserved', statement_timestamp() + interval '14 days')`,
+        [randomUUID(), NEED_URGENT, randomUUID(), randomBytes(32)]
+      );
+      await holder.query('COMMIT');
+
+      const res = await pending;
+      status = res.statusCode;
+    } finally {
+      await holder.query('ROLLBACK').catch(() => {});
+      holder.release();
+    }
+
+    expect(status).toBe(409);
+
     const { rows } = await pool.query(
       `SELECT COALESCE(SUM(o.quantity),0)::bigint AS reserved
        FROM offers o WHERE o.need_id = $1 AND o.status = 'reserved'`,
