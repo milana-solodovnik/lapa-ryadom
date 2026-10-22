@@ -52,6 +52,9 @@ demo-assets/raw/
 # Slide QA render artifacts (LibreOffice output)
 slides/qa-render/
 
+# Office lock files left behind when a .pptx/.docx is opened
+~$*
+
 # Digital Q.DataBase distribution / data dir
 infra/qdb-dist/
 infra/qdb-data/
