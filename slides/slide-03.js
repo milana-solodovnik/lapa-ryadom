@@ -1,18 +1,13 @@
-// Slide 3 -- Content / Timeline-Process: four steps from need to result
+// Слайд 3 — четыре шага от потребности к результату.
+const B = require('./lib/brand.js');
+
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
+  B.light(pres, slide);
+  B.pageNo(pres, slide, 3);
 
-  addPageBadge(pres, slide, theme, 3);
-
-  slide.addText('От потребности -- к результату', {
-    x: 0.6, y: 0.42, w: 8.8, h: 0.6, margin: 0,
-    fontFace: 'Georgia', fontSize: 30, bold: true, color: theme.primary
-  });
-  slide.addText('Четыре шага. Регистрация посетителю не нужна.', {
-    x: 0.6, y: 1.02, w: 8.8, h: 0.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 14, color: theme.secondary
-  });
+  B.heading(pres, slide, 'От потребности — к результату',
+    'Четыре шага. Регистрация посетителю не нужна.');
 
   const steps = [
     { n: '1', title: 'Приют публикует потребность', body: 'Категория, количество, приоритет, адрес и часы приёма.' },
@@ -21,72 +16,63 @@ function createSlide(pres, theme) {
     { n: '4', title: 'Приют подтверждает факт', body: 'Вводит код и указывает, сколько реально принято.' }
   ];
 
-  const boxW = 2.02;
-  const gap = 0.24;
-  const startX = 0.6;
+  const BOX_W = 2.02;
+  const GAP = 0.24;
+  const TOP = 1.30;
 
   steps.forEach(function (s, i) {
-    const x = startX + i * (boxW + gap);
-    const top = 1.62;
+    const x = B.M + i * (BOX_W + GAP);
 
-    // number badge
+    // Номер шага — маджента-круг, как маркеры на референсных слайдах.
     slide.addShape(pres.shapes.OVAL, {
-      x: x, y: top, w: 0.46, h: 0.46, fill: { color: theme.accent }
+      x: x, y: TOP, w: 0.42, h: 0.42, fill: { color: theme.accent }
     });
     slide.addText(s.n, {
-      x: x, y: top, w: 0.46, h: 0.46, margin: 0, align: 'center', valign: 'middle',
-      fontFace: 'Georgia', fontSize: 17, bold: true, color: theme.bg
+      x: x, y: TOP, w: 0.42, h: 0.42, margin: 0, align: 'center', valign: 'middle',
+      fontFace: theme.fontDisplay, fontSize: 16, bold: true, color: theme.white
     });
 
-    // connector
     if (i < steps.length - 1) {
       slide.addShape(pres.shapes.LINE, {
-        x: x + boxW + 0.03, y: top + 0.23, w: gap - 0.06, h: 0,
-        line: { color: theme.secondary, width: 1.5, dashType: 'dash' }
+        x: x + BOX_W + 0.03, y: TOP + 0.21, w: GAP - 0.06, h: 0,
+        line: { color: theme.line, width: 1.5, dashType: 'dash' }
       });
     }
 
-    // card
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: top + 0.62, w: boxW, h: 2.08,
-      fill: { color: theme.light },
-      shadow: { type: 'outer', color: '000000', blur: 6, offset: 2, angle: 135, opacity: 0.1 }
-    });
+    B.card(pres, slide, { x: x, y: TOP + 0.58, w: BOX_W, h: 1.88 });
     slide.addText(s.title, {
-      x: x + 0.16, y: top + 0.78, w: boxW - 0.32, h: 0.72, margin: 0,
-      fontFace: 'Georgia', fontSize: 13.5, bold: true, color: theme.primary
+      x: x + 0.16, y: TOP + 0.74, w: BOX_W - 0.32, h: 0.66, margin: 0, valign: 'top',
+      fontFace: theme.fontDisplay, fontSize: 13, bold: true, color: theme.ink
     });
     slide.addText(s.body, {
-      x: x + 0.16, y: top + 1.52, w: boxW - 0.32, h: 1.05, margin: 0,
-      fontFace: 'Calibri', fontSize: 11, color: theme.primary
+      x: x + 0.16, y: TOP + 1.44, w: BOX_W - 0.32, h: 0.92, margin: 0, valign: 'top',
+      fontFace: theme.fontBody, fontSize: 10, color: theme.muted
     });
   });
 
-  // Result strip. Authoritative D2 state per docs/07_DEMO_AND_PITCH.md section 7.2.
-  // Promised MUST be 0 after a partial handover, otherwise the deck contradicts
-  // the formula shown on slide 5 and the core "promised != received" idea.
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 4.5, w: 8.8, h: 0.62, fill: { color: theme.primary }
+  // Итог после передачи. Те же числа, что на слайдах интерфейса (состояние D2):
+  // после частичной приёмки обещанное обнуляется, а непривезённое возвращается
+  // в свободный остаток. Иначе цифры противоречили бы слайдам 4 и 5.
+  B.gradStrip(pres, slide, 0.6, 4.02, 8.2, 0.91);
+  slide.addText('ИТОГ ПОСЛЕ ПЕРЕДАЧИ', {
+    x: 0.9, y: 4.02, w: 2.3, h: 0.91, margin: 0, valign: 'middle',
+    fontFace: theme.fontBody, fontSize: 10, color: 'EEDCF7', charSpacing: 1.4
   });
   slide.addText([
-    { text: 'Итог после передачи:   ', options: { bold: true } },
-    { text: '50 требуется   |   0 обещано   |   3 получено   |   47 свободно', options: {} }
+    { text: '50', options: { bold: true, fontSize: 17 } },
+    { text: ' требуется     ', options: { fontSize: 11 } },
+    { text: '0', options: { bold: true, fontSize: 17 } },
+    { text: ' обещано     ', options: { fontSize: 11 } },
+    { text: '3', options: { bold: true, fontSize: 17 } },
+    { text: ' получено     ', options: { fontSize: 11 } },
+    { text: '47', options: { bold: true, fontSize: 17 } },
+    { text: ' свободно', options: { fontSize: 11 } }
   ], {
-    x: 0.9, y: 4.5, w: 8.2, h: 0.62, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 14, color: theme.bg
+    x: 3.1, y: 4.02, w: 5.5, h: 0.91, margin: 0, valign: 'middle', align: 'right',
+    fontFace: theme.fontDisplay, color: theme.white
   });
 
   return slide;
-}
-
-function addPageBadge(pres, slide, theme, n) {
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, fill: { color: theme.primary }
-  });
-  slide.addText(String(n), {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
-    fontFace: 'Calibri', fontSize: 11, color: theme.bg
-  });
 }
 
 module.exports = { createSlide };

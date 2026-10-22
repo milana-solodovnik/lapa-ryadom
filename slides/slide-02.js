@@ -1,110 +1,88 @@
-// Slide 2 -- Content / Comparison: the problem, two actors with a gap between them
+// Слайд 2 — проблема: две стороны и разрыв между ними.
+const B = require('./lib/brand.js');
+
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
+  B.light(pres, slide);
+  B.pageNo(pres, slide, 2);
 
-  addPageBadge(pres, slide, theme, 2);
+  B.heading(pres, slide, 'Помощь есть. Но не всегда попадает туда, где нужна',
+    'Приют знает, сколько нужно. Человек знает, сколько может. Связи между ними нет.');
 
-  slide.addText('Помощь есть. Но не всегда попадает туда, где нужна', {
-    x: 0.6, y: 0.42, w: 8.8, h: 0.6, margin: 0,
-    fontFace: 'Georgia', fontSize: 27, bold: true, color: theme.primary, fit: 'shrink'
-  });
+  const TOP = 1.22;
+  const CH = 2.34;
+  const CW = 3.62;
 
-  // ---- Left card: shelter ----
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 1.28, w: 3.65, h: 2.72,
-    fill: { color: theme.light },
-    shadow: { type: 'outer', color: '000000', blur: 8, offset: 2, angle: 135, opacity: 0.1 }
-  });
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 1.28, w: 3.65, h: 0.06, fill: { color: theme.secondary }
-  });
+  const cards = [
+    {
+      x: 0.6, rule: theme.violet, kicker: 'ПРИЮТ',
+      headline: 'Нужны 50 упаковок корма',
+      items: [
+        'Публикация в соцсетях устаревает',
+        'Привезли часть — непонятно, сколько ещё нужно',
+        'Объявления теряются среди других'
+      ]
+    },
+    {
+      x: 5.78, rule: theme.pink, kicker: 'ЧЕЛОВЕК',
+      headline: 'Есть 5 упаковок',
+      items: [
+        'Не знает, кому именно это нужно',
+        'Не хочет заводить аккаунт и оставлять телефон',
+        'Готов помочь, но не знает, куда привезти'
+      ]
+    }
+  ];
 
-  slide.addText('ПРИЮТ', {
-    x: 0.85, y: 1.52, w: 3.1, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.primary, charSpacing: 1.4, bold: true
-  });
-  slide.addText('Нужны 50 упаковок корма', {
-    x: 0.85, y: 1.84, w: 3.1, h: 0.62, margin: 0,
-    fontFace: 'Georgia', fontSize: 16, bold: true, color: theme.primary
-  });
-  slide.addText([
-    { text: 'Публикация в соцсетях устаревает', options: { breakLine: true } },
-    { text: 'Привезли часть -- непонятно, сколько ещё нужно', options: { breakLine: true } },
-    { text: 'Объявления теряются среди других', options: {} }
-  ], {
-    x: 0.85, y: 2.52, w: 3.1, h: 1.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 12, color: theme.primary, paraSpaceAfter: 6
-  });
-
-  // ---- Right card: person ----
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.75, y: 1.28, w: 3.65, h: 2.72,
-    fill: { color: theme.light },
-    shadow: { type: 'outer', color: '000000', blur: 8, offset: 2, angle: 135, opacity: 0.1 }
-  });
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.75, y: 1.28, w: 3.65, h: 0.06, fill: { color: theme.accent }
-  });
-
-  slide.addText('ЧЕЛОВЕК', {
-    x: 6.0, y: 1.52, w: 3.1, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.primary, charSpacing: 1.4, bold: true
-  });
-  slide.addText('Есть 5 упаковок', {
-    x: 6.0, y: 1.84, w: 3.1, h: 0.62, margin: 0,
-    fontFace: 'Georgia', fontSize: 16, bold: true, color: theme.primary
-  });
-  slide.addText([
-    { text: 'Не знает, кому именно это нужно', options: { breakLine: true } },
-    { text: 'Не хочет заводить аккаунт и оставлять телефон', options: { breakLine: true } },
-    { text: 'Готов помочь, но не знает, куда привезти', options: {} }
-  ], {
-    x: 6.0, y: 2.52, w: 3.1, h: 1.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 12, color: theme.primary, paraSpaceAfter: 6
+  cards.forEach(function (c) {
+    B.card(pres, slide, { x: c.x, y: TOP, w: CW, h: CH });
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+      x: c.x, y: TOP, w: CW, h: 0.055, rectRadius: 0.027,
+      fill: { color: c.rule }
+    });
+    B.eyebrow(pres, slide, c.kicker, { x: c.x + 0.24, y: TOP + 0.2, w: CW - 0.5 });
+    slide.addText(c.headline, {
+      x: c.x + 0.24, y: TOP + 0.48, w: CW - 0.5, h: 0.5, margin: 0, valign: 'top',
+      fontFace: theme.fontDisplay, fontSize: 16, bold: true, color: theme.ink
+    });
+    B.bullets(pres, slide, c.items, {
+      x: c.x + 0.24, y: TOP + 1.06, w: CW - 0.5, h: 1.1,
+      size: 11, gap: 6
+    });
   });
 
-  // ---- The gap in the middle ----
+  // ---- Разрыв в середине ----
   slide.addShape(pres.shapes.LINE, {
-    x: 4.32, y: 2.64, w: 0.62, h: 0,
-    line: { color: theme.accent, width: 2, dashType: 'dash' }
+    x: 4.32, y: 2.39, w: 0.5, h: 0,
+    line: { color: theme.accent, width: 1.75, dashType: 'dash' }
   });
   slide.addShape(pres.shapes.LINE, {
-    x: 5.06, y: 2.64, w: 0.62, h: 0,
-    line: { color: theme.accent, width: 2, dashType: 'dash' }
+    x: 5.18, y: 2.39, w: 0.5, h: 0,
+    line: { color: theme.accent, width: 1.75, dashType: 'dash' }
   });
   slide.addShape(pres.shapes.OVAL, {
-    x: 4.82, y: 2.42, w: 0.44, h: 0.44, fill: { color: theme.accent }
+    x: 4.78, y: 2.17, w: 0.44, h: 0.44, fill: { color: theme.accent }
   });
   slide.addText('!', {
-    x: 4.82, y: 2.44, w: 0.44, h: 0.4, margin: 0, align: 'center', valign: 'middle',
-    fontFace: 'Georgia', fontSize: 18, bold: true, color: theme.bg
+    x: 4.78, y: 2.18, w: 0.44, h: 0.42, margin: 0, align: 'center', valign: 'middle',
+    fontFace: theme.fontDisplay, fontSize: 17, bold: true, color: theme.white
   });
   slide.addText('разрыв', {
-    x: 4.52, y: 2.95, w: 1.06, h: 0.26, margin: 0, align: 'center',
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.accent
+    x: 4.48, y: 2.66, w: 1.04, h: 0.24, margin: 0, align: 'center',
+    fontFace: theme.fontBody, fontSize: 10, color: theme.accent
   });
 
-  // ---- Takeaway ----
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 4.28, w: 8.8, h: 0.82, fill: { color: theme.primary }
-  });
-  slide.addText('Люди готовы помогать, но не знают, кому именно что нужно сейчас. Проблема не в нехватке вещей, а в отсутствии адресного учёта.', {
-    x: 0.9, y: 4.36, w: 8.2, h: 0.66, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 14, color: theme.bg
+  // ---- Вывод на фирменной градиентной полосе ----
+  B.gradStrip(pres, slide, 0.6, 3.82, 8.2, 0.91);
+  slide.addText([
+    { text: 'Проблема не в нехватке вещей, ', options: { bold: true } },
+    { text: 'а в отсутствии адресного учёта: люди готовы помогать, но не знают, кому именно что нужно сейчас.', options: {} }
+  ], {
+    x: 0.9, y: 3.82, w: 7.6, h: 0.91, margin: 0, valign: 'middle',
+    fontFace: theme.fontBody, fontSize: 12, color: theme.white
   });
 
   return slide;
-}
-
-function addPageBadge(pres, slide, theme, n) {
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, fill: { color: theme.primary }
-  });
-  slide.addText(String(n), {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
-    fontFace: 'Calibri', fontSize: 11, color: theme.bg
-  });
 }
 
 module.exports = { createSlide };

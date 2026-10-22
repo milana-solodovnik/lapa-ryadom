@@ -1,96 +1,105 @@
-// Slide 6 -- Полиглот: одна база, два языка.
+// Слайд 6 — полиглот: одна база, два языка.
+//
+// Слева карточка с настоящим T-SQL из scripts/qdb-mssql-check.ps1 — не
+// псевдокод: этот запрос выполняется при проверке и возвращает available = 45.
+// Справа то, что тем же прогоном подтверждено.
+const B = require('./lib/brand.js');
+
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
+  B.light(pres, slide);
+  B.pageNo(pres, slide, 6);
 
-  addPageBadge(pres, slide, theme, 6);
+  B.heading(pres, slide, 'Полиглот: база говорит на двух языках',
+    'Проект перенесён на Digital Q.DataBase без правок — и эта же база отвечает по протоколу Microsoft SQL.');
 
-  slide.addText('Полиглот: база говорит на двух языках', {
-    x: 0.62, y: 0.24, w: 8.8, h: 0.46, margin: 0,
-    fontFace: 'Georgia', fontSize: 25, bold: true, color: theme.primary, fit: 'shrink'
+  // ---- Карточка с T-SQL ----
+  const CX = 0.6, CY = 1.18, CW = 4.34, CH = 2.94;
+  B.card(pres, slide, { x: CX, y: CY, w: CW, h: CH });
+
+  B.pill(pres, slide, 'T-SQL', { x: CX + 0.24, y: CY + 0.2, w: 0.86, h: 0.26, size: 9 });
+
+  const K = theme.violet;     // ключевые слова
+  const C = theme.body;       // обычный код
+  const M = theme.pink;        // комментарии
+  const lines = [
+    [{ t: '-- тот же счётчик, только на T-SQL', c: M, i: 1 }],
+    [{ t: 'SELECT', c: K, b: 1 }, { t: ' TOP 1', c: C }],
+    [{ t: "       ISNULL(n.title,'?') ", c: C }, { t: 'AS need,', c: K, b: 1 }],
+    [{ t: '       n.target_qty, n.promised, n.received,', c: C }],
+    [{ t: '       n.target_qty', c: C }],
+    [{ t: '         - ISNULL(n.promised,0)', c: C }],
+    [{ t: '         - ISNULL(n.received,0) ', c: C }, { t: 'AS available', c: K, b: 1 }],
+    [{ t: '  FROM dbo.needs ', c: K, b: 1 }, { t: 'AS n', c: C }],
+    [{ t: ' WHERE n.need_id = 1;', c: K, b: 1 }]
+  ];
+
+  const runs = [];
+  lines.forEach(function (parts, i) {
+    parts.forEach(function (p, j) {
+      runs.push({
+        text: p.t,
+        options: {
+          color: p.c, bold: !!p.b, italic: !!p.i,
+          breakLine: (j === parts.length - 1) && (i < lines.length - 1)
+        }
+      });
+    });
   });
-  slide.addText('Проект перенесён на Digital Q.DataBase — и эта же база отвечает по протоколу Microsoft SQL.', {
-    x: 0.62, y: 0.70, w: 8.9, h: 0.32, margin: 0,
-    fontFace: 'Calibri', fontSize: 12.5, color: theme.secondary
+
+  slide.addText(runs, {
+    x: CX + 0.24, y: CY + 0.56, w: CW - 0.48, h: 1.92, margin: 0,
+    fontFace: theme.fontMono, fontSize: 8.5, color: C, lineSpacingMultiple: 1.18
   });
 
-  function panel(x, header, headerColor, bullets, proof) {
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 1.26, w: 4.28, h: 0.32, fill: { color: headerColor }
-    });
-    slide.addText(header, {
-      x: x + 0.14, y: 1.26, w: 4.0, h: 0.32, margin: 0, valign: 'middle',
-      fontFace: 'Calibri', fontSize: 9, bold: true, color: theme.bg, charSpacing: 0.7
-    });
-
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 1.58, w: 4.28, h: 2.62,
-      fill: { color: theme.bg }, line: { color: theme.secondary, width: 1 }
-    });
-    slide.addText(bullets.map(function (b, j) {
-      return { text: b, options: { bullet: { indent: 12 }, breakLine: j < bullets.length - 1 } };
-    }), {
-      x: x + 0.2, y: 1.74, w: 3.9, h: 1.9, margin: 0,
-      fontFace: 'Calibri', fontSize: 11.5, color: theme.primary, paraSpaceAfter: 7
-    });
-
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x + 0.2, y: 3.62, w: 3.88, h: 0.44, fill: { color: theme.light }
-    });
-    slide.addText(proof, {
-      x: x + 0.32, y: 3.62, w: 3.64, h: 0.44, margin: 0, valign: 'middle',
-      fontFace: 'Georgia', fontSize: 12.5, bold: true, color: theme.primary
-    });
-  }
-
-  panel(
-    0.62,
-    'POSTGRESQL  →  DIGITAL Q.DATABASE',
-    theme.primary,
-    [
-      'Схема перенеслась без единой правки',
-      'Данные перенесены одной транзакцией',
-      'Ключи, связи и бизнес-ключи сохранены',
-      'Все тесты приложения идут на целевой базе'
-    ],
-    '25 проверок — без расхождений'
-  );
-
-  panel(
-    5.12,
-    'MICROSOFT SQL  →  DIGITAL Q.DATABASE',
-    theme.accent,
-    [
-      'Та же база отвечает по протоколу Microsoft SQL',
-      'Понимает T-SQL: создание таблиц, вставка, выборка',
-      'Автоинкремент и ограничения работают',
-      'Русские названия сохраняются без искажений'
-    ],
-    '9 проверок из 9 пройдено'
-  );
-
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.62, y: 4.42, w: 8.78, h: 0.74, fill: { color: theme.primary }
+  // Что вернул сам сервер.
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    x: CX + 0.24, y: CY + 2.5, w: CW - 0.48, h: 0.32, rectRadius: 0.05,
+    fill: { color: theme.lilac }
   });
+  slide.addText([
+    { text: 'available = ', options: { color: theme.body } },
+    { text: '45', options: { color: theme.accent, bold: true } },
+    { text: '   50 − 5 − 0, посчитала сама база', options: { color: theme.muted } }
+  ], {
+    x: CX + 0.38, y: CY + 2.5, w: CW - 0.76, h: 0.32, margin: 0, valign: 'middle',
+    fontFace: theme.fontMono, fontSize: 8.5
+  });
+
+  // ---- Что подтверждено тем же прогоном ----
+  const RX = 5.24, RW = 4.16;
+  B.eyebrow(pres, slide, 'ПОДТВЕРЖДЕНО ПРОВЕРКАМИ', { x: RX, y: 1.2, w: RW });
+
+  B.bullets(pres, slide, [
+    'Схема со PostgreSQL перенеслась без единой правки',
+    'Та же база отвечает по протоколу Microsoft SQL',
+    'Понимает T-SQL: CREATE TABLE, IDENTITY, CONSTRAINT, ISNULL, TOP',
+    'Ограничения не просто принимаются, а работают: дубль в первичном ключе база отвергает',
+    'Русские названия возвращаются без искажений'
+  ], { x: RX, y: 1.5, w: RW, h: 2.0, size: 10.5, gap: 7 });
+
+  B.card(pres, slide, { x: RX, y: 3.52, w: RW, h: 0.6, shadow: false, fill: theme.lilac, line: theme.line });
+  slide.addText([
+    { text: '25 из 25', options: { bold: true, color: theme.accent, fontSize: 13 } },
+    { text: '  проверок переноса\n', options: { color: theme.body, fontSize: 10 } },
+    { text: '9 из 9', options: { bold: true, color: theme.accent, fontSize: 13 } },
+    { text: '  проверок T-SQL', options: { color: theme.body, fontSize: 10 } }
+  ], {
+    x: RX + 0.22, y: 3.52, w: RW - 0.44, h: 0.6, margin: 0, valign: 'middle',
+    fontFace: theme.fontBody
+  });
+
+  // ---- Вывод на фирменной полосе ----
+  B.gradStrip(pres, slide, 0.6, 4.32, 8.2, 0.91);
   slide.addText([
     { text: 'Одна база — два языка. ', options: { bold: true } },
     { text: 'Приложение, которое вы видели, работает на Digital Q.DataBase.', options: {} }
   ], {
-    x: 0.86, y: 4.42, w: 8.3, h: 0.74, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 13.5, color: theme.bg
+    x: 0.9, y: 4.32, w: 7.6, h: 0.91, margin: 0, valign: 'middle',
+    fontFace: theme.fontBody, fontSize: 12, color: theme.white
   });
 
   return slide;
-}
-
-function addPageBadge(pres, slide, theme, n) {
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 9.3, y: 5.18, w: 0.42, h: 0.3, fill: { color: theme.primary }
-  });
-  slide.addText(String(n), {
-    x: 9.3, y: 5.18, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
-    fontFace: 'Calibri', fontSize: 11, color: theme.bg
-  });
 }
 
 module.exports = { createSlide };

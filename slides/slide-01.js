@@ -1,118 +1,105 @@
-// Slide 1 -- Cover page (asymmetric left text / right dark panel)
+// Слайд 1 — титульный.
+//
+// Слева светлая часть с сиреневым градиентом, справа фирменная панель.
+// Числа справа — реальное состояние после передачи из тех же прогонов,
+// что и на слайдах интерфейса (D2): 50 / 0 / 3 / 47.
+const B = require('./lib/brand.js');
+
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
+  B.light(pres, slide);
 
-  // Right dark panel
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 6.1, y: 0, w: 3.9, h: 5.625,
-    fill: { color: theme.primary }
+  // ---- Правая панель ----
+  const PANEL_X = 5.6;
+  const PANEL_W = B.SLIDE_W - PANEL_X;
+  slide.addImage({
+    path: B.asset('panel-purple.png'),
+    x: PANEL_X, y: 0, w: PANEL_W, h: B.SLIDE_H
   });
 
-  // Decorative paw-like dots on the light side
-  slide.addShape(pres.shapes.OVAL, { x: 5.55, y: 0.62, w: 0.16, h: 0.16, fill: { color: theme.accent } });
-  slide.addShape(pres.shapes.OVAL, { x: 5.78, y: 0.78, w: 0.12, h: 0.12, fill: { color: theme.secondary } });
-  slide.addShape(pres.shapes.OVAL, { x: 5.46, y: 0.84, w: 0.1, h: 0.1, fill: { color: theme.light } });
+  const PX = PANEL_X + 0.42;      // внутреннее поле панели
+  const PW = PANEL_W - 0.84;
 
-  // Eyebrow
-  slide.addText('КОНКУРС ПРОЕКТОВ DIGITAL Q.DATABASE 2026', {
-    x: 0.7, y: 0.95, w: 4.6, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.accent,
-    charSpacing: 1.6, bold: false
-  });
-
-  // Main title
-  slide.addText('Лапа рядом', {
-    x: 0.66, y: 1.3, w: 5.0, h: 1.0, margin: 0,
-    fontFace: 'Georgia', fontSize: 54, bold: true, color: theme.primary, fit: 'shrink'
-  });
-
-  // Subtitle
-  slide.addText('Адресная помощь приютам для животных', {
-    x: 0.7, y: 2.38, w: 5.0, h: 0.4, margin: 0,
-    fontFace: 'Calibri', fontSize: 20, color: theme.secondary
-  });
-
-  // Divider
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.7, y: 3.05, w: 1.1, h: 0.035, fill: { color: theme.accent }
-  });
-
-  // Presenter
-  slide.addText('Милана Солодовник', {
-    x: 0.7, y: 3.20, w: 5.0, h: 0.38, margin: 0,
-    fontFace: 'Georgia', fontSize: 18, bold: true, color: theme.primary
-  });
-
-  slide.addText('Московский технический университет связи и информатики (МТУСИ)', {
-    x: 0.7, y: 3.62, w: 5.0, h: 0.26, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.primary
-  });
-
-  slide.addText('Колледж Телекоммуникаций', {
-    x: 0.7, y: 3.90, w: 5.0, h: 0.24, margin: 0,
-    fontFace: 'Calibri', fontSize: 9.5, color: theme.secondary
-  });
-
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.7, y: 4.34, w: 1.1, h: 0.03, fill: { color: theme.accent }
-  });
-
-  slide.addText('День СУБД 2026  --  27 октября, Москва, Кибердом', {
-    x: 0.7, y: 4.48, w: 5.0, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.secondary
-  });
-
-  slide.addText('Демонстрационный проект. Приюты и передачи вымышлены.', {
-    x: 0.7, y: 4.80, w: 5.0, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 9.5, color: theme.secondary
-  });
-
-  // ---- Panel content ----
-  slide.addText('УЧЁТ ПОМОЩИ', {
-    x: 6.55, y: 0.85, w: 3.0, h: 0.26, margin: 0,
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.light, charSpacing: 1.6
-  });
-
+  B.eyebrow(pres, slide, 'УЧЁТ ПОМОЩИ', { x: PX, y: 0.78, w: PW, color: 'E3D4F2' });
   slide.addText('Итог после передачи', {
-    x: 6.55, y: 1.18, w: 3.0, h: 0.34, margin: 0,
-    fontFace: 'Georgia', fontSize: 14, bold: true, color: theme.bg
+    x: PX, y: 1.04, w: PW, h: 0.32, margin: 0,
+    fontFace: theme.fontDisplay, fontSize: 15, bold: true, color: theme.white
   });
-
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 6.55, y: 1.62, w: 3.0, h: 0.02, fill: { color: theme.secondary }
+    x: PX, y: 1.44, w: PW, h: 0.012,
+    fill: { color: theme.white, transparency: 65 }
   });
 
-  // The D2 state shown here is the same run as the interface slides: five
-  // promised, three handed over, the two uncollected packs released back.
   const rows = [
-    { label: 'требуется', value: '50', vColor: theme.bg, vSize: 26 },
-    { label: 'обещано', value: '0', vColor: theme.light, vSize: 22 },
-    { label: 'получено', value: '3', vColor: theme.light, vSize: 22 },
-    { label: 'свободно', value: '47', vColor: theme.accent, vSize: 30 }
+    { label: 'требуется', value: '50', color: theme.white, size: 24 },
+    { label: 'обещано', value: '0', color: 'E8D9F4', size: 20 },
+    { label: 'получено', value: '3', color: 'E8D9F4', size: 20 },
+    { label: 'свободно', value: '47', color: 'FFC7E2', size: 30 }
   ];
   rows.forEach(function (r, i) {
-    const y = 1.78 + i * 0.6;
+    const y = 1.60 + i * 0.56;
     slide.addText(r.label, {
-      x: 6.55, y: y + 0.08, w: 1.6, h: 0.3, margin: 0,
-      fontFace: 'Calibri', fontSize: 12, color: theme.bg
+      x: PX, y: y + 0.08, w: 1.6, h: 0.28, margin: 0,
+      fontFace: theme.fontBody, fontSize: 11.5, color: theme.white
     });
     slide.addText(r.value, {
-      x: 8.05, y: y, w: 1.5, h: 0.45, margin: 0, align: 'right',
-      fontFace: 'Georgia', fontSize: r.vSize, bold: true, color: r.vColor
+      x: PX + 1.5, y: y, w: PW - 1.5, h: 0.44, margin: 0, align: 'right',
+      fontFace: theme.fontDisplay, fontSize: r.size, bold: true, color: r.color
     });
   });
 
   slide.addText('упаковок сухого корма для собак', {
-    x: 6.55, y: 4.28, w: 3.0, h: 0.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.secondary
+    x: PX, y: 3.98, w: PW, h: 0.26, margin: 0,
+    fontFace: theme.fontBody, fontSize: 10.5, color: 'E8D9F4'
   });
-
   slide.addText('Обещали 5, привезли 3. Две непривезённые упаковки вернулись в свободный остаток.', {
-    x: 6.55, y: 4.62, w: 3.0, h: 0.6, margin: 0,
-    fontFace: 'Calibri', fontSize: 11, color: theme.bg, italic: true
+    x: PX, y: 4.26, w: PW, h: 0.7, margin: 0,
+    fontFace: theme.fontBody, fontSize: 10.5, color: theme.white, italic: true
   });
 
+  // ---- Левая часть ----
+  B.eyebrow(pres, slide, 'КОНКУРС DIGITAL Q.DATABASE 2026', { x: 0.68, y: 0.86, w: 4.6 });
+
+  slide.addText('Лапа рядом', {
+    x: 0.64, y: 1.14, w: 4.6, h: 0.86, margin: 0,
+    fontFace: theme.fontDisplay, fontSize: 50, bold: true, color: theme.ink, fit: 'shrink'
+  });
+  slide.addText('Адресная помощь приютам для животных', {
+    x: 0.68, y: 2.04, w: 4.6, h: 0.34, margin: 0,
+    fontFace: theme.fontBody, fontSize: 15.5, color: theme.body
+  });
+
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.68, y: 2.58, w: 1.05, h: 0.035, fill: { color: theme.accent }
+  });
+
+  slide.addText('Милана Солодовник', {
+    x: 0.68, y: 2.74, w: 4.6, h: 0.34, margin: 0,
+    fontFace: theme.fontDisplay, fontSize: 17, bold: true, color: theme.ink
+  });
+  slide.addText('Московский технический университет связи и информатики (МТУСИ)', {
+    x: 0.68, y: 3.10, w: 4.6, h: 0.24, margin: 0,
+    fontFace: theme.fontBody, fontSize: 10.5, color: theme.body
+  });
+  slide.addText('Колледж Телекоммуникаций', {
+    x: 0.68, y: 3.34, w: 4.6, h: 0.22, margin: 0,
+    fontFace: theme.fontBody, fontSize: 9.5, color: theme.muted
+  });
+
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.68, y: 3.80, w: 1.05, h: 0.02, fill: { color: theme.line }
+  });
+  slide.addText('День СУБД 2026  —  27 октября, Москва, Кибердом', {
+    x: 0.68, y: 3.92, w: 4.6, h: 0.26, margin: 0,
+    fontFace: theme.fontBody, fontSize: 10.5, color: theme.muted
+  });
+
+  // Три круга лапки в акцентных цветах — мотив сохраняется, палитра новая.
+  slide.addShape(pres.shapes.OVAL, { x: 4.72, y: 1.12, w: 0.15, h: 0.15, fill: { color: theme.accent } });
+  slide.addShape(pres.shapes.OVAL, { x: 4.93, y: 1.27, w: 0.11, h: 0.11, fill: { color: theme.pink } });
+  slide.addShape(pres.shapes.OVAL, { x: 4.64, y: 1.33, w: 0.09, h: 0.09, fill: { color: theme.violet } });
+
+  B.pageNo(pres, slide, 1, 'E3D4F2');
   return slide;
 }
 

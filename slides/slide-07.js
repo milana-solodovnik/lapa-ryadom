@@ -1,18 +1,18 @@
-// Slide 7 -- Итог.
+// Слайд 7 — итог. Тёмный, в фирменном градиенте.
+const B = require('./lib/brand.js');
+
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
-  slide.background = { color: theme.primary };
-
-  addPageBadge(pres, slide, theme, 7, theme.bg, theme.accent);
+  B.dark(pres, slide);
+  B.pageNo(pres, slide, 7, 'E3D4F2');
 
   slide.addText('Одна маленькая помощь — видимый результат', {
-    x: 0.6, y: 0.62, w: 9.0, h: 0.72, margin: 0,
-    fontFace: 'Georgia', fontSize: 27, bold: true, color: theme.bg, fit: 'shrink'
+    x: 0.6, y: 0.52, w: 8.8, h: 0.62, margin: 0,
+    fontFace: theme.fontDisplay, fontSize: 28, bold: true, color: theme.white, fit: 'shrink'
   });
-
   slide.addText('Иногда помощь — это всего несколько упаковок корма. Главное — знать, где они действительно нужны.', {
-    x: 0.6, y: 1.42, w: 8.6, h: 0.5, margin: 0,
-    fontFace: 'Calibri', fontSize: 14, color: theme.light, italic: true
+    x: 0.6, y: 1.2, w: 8.2, h: 0.4, margin: 0,
+    fontFace: theme.fontBody, fontSize: 13, color: 'EEDCF7'
   });
 
   const items = [
@@ -23,38 +23,32 @@ function createSlide(pres, theme) {
 
   items.forEach(function (it, i) {
     const x = 0.6 + i * 3.03;
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 2.3, w: 2.85, h: 1.72, fill: { color: theme.bg }
-    });
-    slide.addShape(pres.shapes.RECTANGLE, {
-      x: x, y: 2.3, w: 2.85, h: 0.05, fill: { color: theme.accent }
+    const w = 2.85;
+    B.card(pres, slide, { x: x, y: 1.98, w: w, h: 2.0, fill: theme.white });
+    slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+      x: x, y: 1.98, w: w, h: 0.05, rectRadius: 0.025,
+      fill: { color: i === 2 ? theme.pink : theme.accent }
     });
     slide.addText(it.t, {
-      x: x + 0.2, y: 2.54, w: 2.45, h: 0.32, margin: 0,
-      fontFace: 'Georgia', fontSize: 15, bold: true, color: theme.primary
+      x: x + 0.22, y: 2.2, w: w - 0.44, h: 0.34, margin: 0, valign: 'top',
+      fontFace: theme.fontDisplay, fontSize: 15, bold: true, color: theme.ink
     });
     slide.addText(it.d, {
-      x: x + 0.2, y: 2.94, w: 2.45, h: 1.0, margin: 0,
-      fontFace: 'Calibri', fontSize: 11, color: theme.primary
+      x: x + 0.22, y: 2.58, w: w - 0.44, h: 1.26, margin: 0, valign: 'top',
+      fontFace: theme.fontBody, fontSize: 10.5, color: theme.body
     });
   });
 
   slide.addText('СПАСИБО ЗА ВНИМАНИЕ', {
-    x: 0.6, y: 4.46, w: 8.8, h: 0.4, margin: 0, align: 'center',
-    fontFace: 'Georgia', fontSize: 19, bold: true, color: theme.bg, charSpacing: 1.6
+    x: 0.6, y: 4.26, w: 8.8, h: 0.36, margin: 0, align: 'center',
+    fontFace: theme.fontDisplay, fontSize: 18, bold: true, color: theme.white, charSpacing: 2
+  });
+  slide.addText('Милана Солодовник  ·  МТУСИ, Колледж Телекоммуникаций  ·  День СУБД 2026', {
+    x: 0.6, y: 4.66, w: 8.8, h: 0.28, margin: 0, align: 'center',
+    fontFace: theme.fontBody, fontSize: 10.5, color: 'EEDCF7'
   });
 
   return slide;
-}
-
-function addPageBadge(pres, slide, theme, n, bgColor, textColor) {
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 9.3, y: 5.18, w: 0.42, h: 0.3, fill: { color: bgColor }
-  });
-  slide.addText(String(n), {
-    x: 9.3, y: 5.18, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
-    fontFace: 'Calibri', fontSize: 11, color: textColor
-  });
 }
 
 module.exports = { createSlide };
