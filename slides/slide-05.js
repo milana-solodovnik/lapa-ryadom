@@ -65,9 +65,9 @@ function createSlide(pres, theme) {
   });
 
   // ---- Right: counter table ----
-  slide.addText('СЧЁТЧИКИ НА ЭКРАНЕ', {
+  slide.addText('СЧЁТЧИКИ НА ЭКРАНЕ — «СУХОЙ КОРМ ДЛЯ ВЗРОСЛЫХ СОБАК»', {
     x: 5.2, y: 1.34, w: 4.2, h: 0.26, margin: 0,
-    fontFace: 'Calibri', fontSize: 10, color: theme.primary, charSpacing: 1.2, bold: true
+    fontFace: 'Calibri', fontSize: 8.5, color: theme.primary, charSpacing: 0.8, bold: true
   });
 
   const head = function (t) {
@@ -86,9 +86,9 @@ function createSlide(pres, theme) {
 
   const rows = [
     [head('Шаг'), head('Требуется'), head('Обещано'), head('Получено'), head('Свободно')],
-    [labelCell('D0 начало'), cell('20'), cell('0'), cell('0'), cell('20', { bold: true })],
-    [labelCell('D1 обещали 5'), cell('20'), cell('5', { bold: true, color: 'bc6c25' }), cell('0'), cell('15', { bold: true })],
-    [labelCell('D2 приняли 3'), cell('20'), cell('0'), cell('3', { bold: true, color: 'bc6c25' }), cell('17', { bold: true, color: 'bc6c25' })]
+    [labelCell('D0 начало'), cell('50'), cell('0'), cell('0'), cell('50', { bold: true })],
+    [labelCell('D1 обещали 5'), cell('50'), cell('5', { bold: true, color: 'bc6c25' }), cell('0'), cell('45', { bold: true })],
+    [labelCell('D2 приняли 3'), cell('50'), cell('0'), cell('3', { bold: true, color: 'bc6c25' }), cell('47', { bold: true, color: 'bc6c25' })]
   ];
 
   // colW widened for the 4 numeric columns so the 9pt headers do not break mid-word.

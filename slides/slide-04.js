@@ -1,10 +1,12 @@
-// Slide 4 -- Content / Image Showcase: live demo, with real captured screens.
-// Screenshots are produced by scripts/capture-screenshots.ps1 and
-// scripts/capture-screenshots-deliveries.ps1 against the running dev stack
-// (API 4000, web 5173) using headless Chrome at 1280x900.
+// Slide 4 -- Content / Image Showcase: the D0 -> D1 -> D2 story arc.
+//
+// There is no live demo on stage, so these four frames ARE the demonstration.
+// They were captured by scripts/capture-qdb-screenshots.ps1 from the running
+// dev stack (API 4000, web 5173) using headless Chrome at 1280x900, with the
+// API pointed at the real Digital Q.DataBase 18.2 container.
 //
 // Narrative:
-//   • 4 frames in a row tell the D1 → D2 story arc with the running app.
+//   • 4 frames in a row tell the D1 -> D2 story arc with the running app.
 //   • The D0/D1/D2 control strip is intentionally kept here as the literal
 //     statement of truth; the screenshot tiles just before it are the
 //     observations.
@@ -12,7 +14,7 @@
 // Captured filenames and what they show:
 //   - needs-catalog.png        D0 reference: full availability, no offers
 //   - needs-catalog-d1.png     D1: 5+12+8 units promised across three needs
-//   - shelter-receive-empty.png D2 entry: form rep types the donor's code
+//   - login-page.png           D2 entry: the shelter-desk login form
 //   - needs-catalog-d2.png     D2 state: first offer now `received`
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
@@ -20,7 +22,7 @@ function createSlide(pres, theme) {
 
   addPageBadge(pres, slide, theme, 4);
 
-  slide.addText('Живая демонстрация', {
+  slide.addText('От заявки до приёмки', {
     x: 0.6, y: 0.26, w: 6.0, h: 0.5, margin: 0,
     fontFace: 'Georgia', fontSize: 26, bold: true, color: theme.primary
   });
@@ -44,7 +46,7 @@ function createSlide(pres, theme) {
   const frames = [
     {
       step: 'D0',
-      label: 'КАРТОЧКИ ВНУТРЕННЕЙ ПАНЕЛИ',
+      label: 'КАТАЛОГ — СТАРТОВОЕ СОСТОЯНИЕ',
       path: 'screenshots/needs-catalog.png',
       caption:
         'Стартовое состояние: 10 потребностей, обнулено reserved и received.',
@@ -68,7 +70,7 @@ function createSlide(pres, theme) {
       label: 'КАТАЛОГ ПОСЛЕ ПРИЁМКИ',
       path: 'screenshots/needs-catalog-d2.png',
       caption:
-        'Первая заявка перешла из «обещано» в «получено». Балансы пересчитаны.',
+        'Принято 3 из 5. Две непривезённые упаковки сразу вернулись в свободный остаток.',
     },
   ];
 
@@ -77,6 +79,20 @@ function createSlide(pres, theme) {
     const y = 1.34;
     addShot(pres, slide, theme, x, y, FRAME_W, HEAD_H, IMG_W, IMG_H, f);
   });
+
+  // There is no live demo on stage, so the four frames above ARE the
+  // demonstration. Say where they came from — it is the whole point: the same
+  // application, served by the target database the migration was verified on.
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.62, y: 3.76, w: 0.06, h: 0.34, fill: { color: theme.accent }
+  });
+  slide.addText(
+    'Все четыре кадра сняты с работающего приложения на Digital Q.DataBase 18.2 — на той самой базе, куда выполнен перенос.',
+    {
+      x: 0.8, y: 3.76, w: 8.4, h: 0.34, margin: 0, valign: 'middle',
+      fontFace: 'Calibri', fontSize: 11, color: theme.primary, bold: true
+    }
+  );
 
   // D0/D1/D2 strip at the bottom — the math, without which the screenshots
   // would be pretty but unprovable.
@@ -94,7 +110,7 @@ function createSlide(pres, theme) {
   const pts = [
     { code: 'D0', nums: '50 / 0 / 0 / 50' },
     { code: 'D1', nums: '50 / 5 / 0 / 45' },
-    { code: 'D2', nums: '50 / 0 / 5 / 45' }
+    { code: 'D2', nums: '50 / 0 / 3 / 47' }
   ];
   pts.forEach(function (p, i) {
     const x = 0.62 + i * 2.46;
