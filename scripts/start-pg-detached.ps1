@@ -25,8 +25,10 @@ if (-not (Test-Path $logDir)) {
 
 $pidFile = Join-Path $logDir 'start-pg.pid'
 if (Test-Path $pidFile) {
-  $existing = (Get-Content $pidFile -Raw).Trim()
-  if ($existing -match '^\d+$') {
+  $existing = (Get-Content $pidFile -Raw -ErrorAction SilentlyContinue)
+  if ($null -eq $existing) { $existing = '' }
+  $existing = $existing.Trim()
+  if ($existing -match '^\d+$' -and [int]$existing -gt 0) {
     $alive = Get-Process -Id ([int]$existing) -ErrorAction SilentlyContinue
     if ($alive) {
       Write-Host "[db:up] already running (pid=$existing)"
@@ -37,7 +39,10 @@ if (Test-Path $pidFile) {
 
 $env:PG_RUNTIME_DIR   = $logDir
 $env:PGHOST           = if ($env:PGHOST)           { $env:PGHOST }           else { '127.0.0.1' }
-$env:PGPORT           = if ($env:PGPORT)           { $env:PGPORT }           else { '55432' }
+# 55850 instead of 55432: with Docker Desktop running, Windows reserves
+# 55220-55719 for Hyper-V/WSL2 (see: netsh interface ipv4 show excludedportrange),
+# and a socket bind there fails with WSAEACCES.
+$env:PGPORT           = if ($env:PGPORT)           { $env:PGPORT }           else { '55850' }
 $env:PGUSER           = if ($env:PGUSER)           { $env:PGUSER }           else { 'db' }
 $env:PGPASSWORD       = if ($env:PGPASSWORD)       { $env:PGPASSWORD }       else { 'db' }
 $env:PGDATABASE       = if ($env:PGDATABASE)       { $env:PGDATABASE }       else { 'db' }

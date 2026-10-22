@@ -11,7 +11,7 @@
 | Веб | React 18 + TypeScript + Vite + React Router (CSS Modules) |
 | API | Node.js 24 LTS + TypeScript + Fastify + Zod |
 | БД (разработка) | PostgreSQL 16, поднимается локально через `embedded-postgres` (без системной установки) |
-| БД (целевая) | Digital Q.DataBase — доступ в работе |
+| БД (целевая) | Digital Q.DataBase 18.2 — перенос выполнен и сверен, 25/25 (`docs/START_HERE_QDB.md`) |
 | Авторизация сотрудников | Argon2id + cookie-сессии в таблице `auth_sessions` |
 | Тесты | Vitest (unit + integration), Playwright (E2E) |
 
@@ -57,7 +57,7 @@ Web: `http://localhost:5173`. API: `http://localhost:4000/api/v1/health`.
 | `npm run dev` | Параллельно API (4000) и Web (5173) |
 | `npm run build` | Сборка обеих частей |
 | `npm run test` | Vitest в `apps/api` |
-| `npm run db:up` | Запустить встроенный PostgreSQL на 127.0.0.1:55432 |
+| `npm run db:up` | Запустить встроенный PostgreSQL на 127.0.0.1:55850 |
 | `npm run db:down` | Остановить встроенный PostgreSQL |
 | `npm run db:migrate` | Применить `db/migrations/*.sql` с контролем `schema_migrations` |
 | `npm run db:seed` | Загрузить идемпотентный демонабор из `db/seed` |

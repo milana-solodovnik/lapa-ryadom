@@ -102,7 +102,18 @@ try {
     const colList = cols.map((c) => `"${c}"`).join(', ');
     const placeholders = cols.map((_, i) => `$${i + 1}`).join(', ');
 
-    const { rows } = await src.query(`SELECT ${colList} FROM ${table}`);
+    // Digital Q.DataBase stores TIMESTAMPTZ with millisecond precision while
+    // PostgreSQL keeps microseconds. Verified against 18.2: the same instant
+    // arrives as .981429 on the source and .981 on the target, so
+    // EXTRACT(EPOCH) differs and qdb-05 reports a timestamp mismatch.
+    // Truncating on the way in makes both sides agree, which is the only sane
+    // contract for a database whose clock resolution is 1 ms.
+    const isTime = (c) => /_at$|_on$|timestamp/i.test(c);
+    const selectList = cols
+      .map((c) => (isTime(c) ? `date_trunc('milliseconds', "${c}") AS "${c}"` : `"${c}"`))
+      .join(', ');
+
+    const { rows } = await src.query(`SELECT ${selectList} FROM ${table}`);
     let copied = 0;
     for (const row of rows) {
       const values = cols.map((c) => row[c]);

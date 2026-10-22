@@ -2,7 +2,10 @@
 // Start a local PostgreSQL instance using `embedded-postgres`.
 // Downloads the official PostgreSQL binaries on first run and stores them
 // inside the project (./.pg-runtime) so no system-wide install is required.
-// Connection defaults are 127.0.0.1:55432, user=db, password=db, database=db.
+// Connection defaults are 127.0.0.1:55850, user=db, password=db, database=db.
+// The port moved off 55432 because Windows reserves 55220-55719 for
+// Hyper-V/WSL2 (netsh interface ipv4 show excludedportrange) once Docker
+// Desktop is running, and binding a socket there fails with WSAEACCES.
 // Override via PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE environment variables.
 
 import path from 'node:path';
@@ -13,7 +16,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(here, '..');
 
 const host = process.env.PGHOST ?? '127.0.0.1';
-const port = Number(process.env.PGPORT ?? 55432);
+const port = Number(process.env.PGPORT ?? 55850);
 const user = process.env.PGUSER ?? 'db';
 const password = process.env.PGPASSWORD ?? 'db';
 const database = process.env.PGDATABASE ?? 'db';

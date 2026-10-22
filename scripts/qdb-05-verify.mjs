@@ -75,14 +75,23 @@ const TIME_COLS = {
   deliveries: ['received_at']
 };
 for (const [t, cols] of Object.entries(TIME_COLS)) {
-  const sel = `id::text, ${cols.map((c) => `${c}::text`).join(', ')}`;
+  // Compare instants, not text. `::text` rendering differs between vanilla
+  // PostgreSQL (offset shown, 6 fractional digits) and Digital Q.DataBase
+  // (UTC, 3 fractional digits), so a string compare reports a difference even
+  // when the stored moment is identical. date_trunc('milliseconds') mirrors
+  // what qdb-04 writes and is the actual storage contract.
+  const sel = `id::text, ${cols
+    .map((c) => `EXTRACT(EPOCH FROM date_trunc('milliseconds', ${c}))::text AS ${c}_epoch`)
+    .join(', ')}`;
   const s = await src.query(`SELECT ${sel} FROM ${t} ORDER BY id`);
   const g = await tgt.query(`SELECT ${sel} FROM ${t} ORDER BY id`);
   const same = JSON.stringify(s.rows) === JSON.stringify(g.rows);
   check(
     `timestamps ${t}`,
     same,
-    same ? `${s.rows.length} rows identical (${cols.join(', ')})` : 'timestamps differ'
+    same
+      ? `${s.rows.length} rows identical to the millisecond (${cols.join(', ')})`
+      : 'timestamps differ by more than a millisecond',
   );
 }
 
@@ -150,8 +159,11 @@ for (const [label, sql] of ORPHANS) {
       await tgt.query(mk('77777777-7777-4777-a777-777777777777', '22'), [needId]);
       detail = 'second insert with the same idempotency_key SUCCEEDED';
     } catch (err) {
-      enforced = /duplicate key|unique/i.test(err.message);
-      detail = err.message.split('\n')[0].slice(0, 80);
+      // SQLSTATE 23505 is unique_violation in every implementation. Matching on
+      // the message text fails on Digital Q.DataBase, which reports it in
+      // Russian: «повторяющееся значение ключа нарушает ограничение уникальности».
+      enforced = err.code === '23505' || /duplicate key|unique/i.test(String(err.message));
+      detail = `${err.code ?? 'no-code'}: ${String(err.message).split('\n')[0].slice(0, 70)}`;
     }
     // The failed statement aborts the transaction, so ROLLBACK is the only
     // cleanup that works here; it also removes the probe row.
