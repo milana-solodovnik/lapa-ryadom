@@ -59,6 +59,13 @@ slides/qa-render/
 infra/qdb-dist/
 infra/qdb-data/
 
+# Не публикуем: дистрибутив СУБД, профили браузера и служебные разборы.
+# В infra/ лежит распакованная Q.DataBase и профиль Chrome с cookies и историей.
+infra/
+
+# Референсные слайды Диасофта — чужая собственность, в репозиторий не идут.
+andrew/
+
 # Don't commit seeded real DB dumps
 *.dump
 *.sql.gz
