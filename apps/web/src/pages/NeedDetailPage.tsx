@@ -17,7 +17,12 @@ export function NeedDetailPage(): JSX.Element {
     [needId]
   );
 
-  const [quantity, setQuantity] = useState(1);
+  // Kept as raw text on purpose. Coercing on every keystroke made the field
+  // un-clearable: emptying it produced Number('') === 0, the 0 || 1 fallback
+  // put 1 straight back, and the next digit landed after that 1 — typing a new
+  // quantity gave "15" instead of "5". The value is parsed and checked once, on
+  // submit.
+  const [quantityText, setQuantityText] = useState('1');
   const [submitting, setSubmitting] = useState(false);
   const [offerError, setOfferError] = useState<string | null>(null);
 
@@ -30,18 +35,28 @@ export function NeedDetailPage(): JSX.Element {
   const soldOut = available === 0n;
 
   const submit = async (): Promise<void> => {
+    const parsed = Number(quantityText);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+      setOfferError('Укажите целое количество не меньше 1');
+      return;
+    }
+    if (BigInt(parsed) > available) {
+      setOfferError(`Свободно только ${formatQty(need.availableQty)} ${unitLabel(need.unit)}`);
+      return;
+    }
+
     setSubmitting(true);
     setOfferError(null);
     try {
       const result = await createOffer({
         needId: need.id,
-        quantity,
+        quantity: parsed,
         // Generated once per attempt; a double click or a network retry with
         // the same key can never create two reservations.
         idempotencyKey: newIdempotencyKey(),
       });
       navigate('/offer/result', {
-        state: { code: result.code, quantity, needTitle: need.title, expiresAt: result.expiresAt },
+        state: { code: result.code, quantity: parsed, needTitle: need.title, expiresAt: result.expiresAt },
       });
     } catch (err) {
       setOfferError(err instanceof ApiError ? err.message : 'Не удалось отправить заявку');
@@ -113,8 +128,8 @@ export function NeedDetailPage(): JSX.Element {
                     type="number"
                     min={1}
                     max={Number(available)}
-                    value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
+                    value={quantityText}
+                    onChange={(e) => setQuantityText(e.target.value)}
                   />
                   <span>{unitLabel(need.unit)}</span>
                   <button type="button" onClick={() => void submit()} disabled={submitting}>
