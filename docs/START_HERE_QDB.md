@@ -65,11 +65,25 @@ sparseVhd=true
 docker load -i F:\MVP\hakaton\infra\qdb-dist\_peek\docker-digital-q-database64xid-18-18.2.26061101-ubuntu22_x86_64\docker-qdatabase-18-18.2.26062501-ubuntu22_x86_64.tar.gz
 
 docker run -d --restart always --name=qdatabase-18 --shm-size=1g `
-  -p 15432:5432 -p 15445:5445 -p 15444:5444 `
+  -p 15432:5432 -p 15445:5445 -p 15444:5444 -p 15443:1433 `
   -v qdb_data:/var/lib/qdatabase-18 `
   -v qdb_logs:/var/log/qdatabase-18 `
   qdatabase_docker:latest
 ```
+
+> **Порт 15443 — это Microsoft SQL.** Внутри диалект `marble` держит TDS-слушатель
+> на 1433: это протокол Microsoft SQL Server, он уже включён и работает без
+> дополнительной настройки. Проверяется так:
+>
+> ```powershell
+> powershell -NoProfile -ExecutionPolicy Bypass -File scripts\qdb-mssql-check.ps1
+> # 9 passed, 0 failed
+> # VERDICT: DIGITAL Q.DATABASE ACCEPTS MICROSOFT SQL
+> ```
+>
+> База в MS SQL-пространстве называется `master` (или `tempdb`), а не `qdb`.
+> T-SQL при этом не работает на диалекте `pearl` — это PostgreSQL, он `TOP`,
+> `ISNULL` и `SET DATEFORMAT` не понимает.
 
 > **Внутренние порты в `README_DOCKER.txt` дистрибутива указаны неверно.**
 > Реально: `pearl=5432`, `marble=5445`, `onyx=5444` — а не `5432/1433/1521`.
