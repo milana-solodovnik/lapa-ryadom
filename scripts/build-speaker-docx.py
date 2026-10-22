@@ -24,12 +24,18 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "slides" / "speaker-script.json"
 OUT = ROOT / "docs" / "Лапа рядом — текст выступления.docx"
 
-# Palette shared with the deck so the two artefacts look like one project.
-DARK = RGBColor(0x28, 0x36, 0x18)
-OLIVE = RGBColor(0x60, 0x6C, 0x38)
-ORANGE = RGBColor(0xBC, 0x6C, 0x25)
-CREAM = RGBColor(0xFE, 0xFA, 0xE0)
-INK = RGBColor(0x1F, 0x1F, 0x1F)
+# Palette and type shared with the deck (slides/lib/brand.js) so the script and
+# the slides read as one project.
+INK = RGBColor(0x17, 0x16, 0x1C)
+VIOLET = RGBColor(0x6B, 0x2E, 0x8F)
+ACCENT = RGBColor(0x9C, 0x25, 0x9B)
+WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+
+HEADER_FILL = "9C259B"   # magenta pill colour, white text on it
+ZEBRA_FILL = "F2EAFB"    # the deck's lilac card tint
+
+DISPLAY_FONT = "PT Sans Narrow"
+BODY_FONT = "PT Sans"
 
 
 def shade(cell, hex_color):
@@ -39,7 +45,7 @@ def shade(cell, hex_color):
     cell._tc.get_or_add_tcPr().append(el)
 
 
-def set_cell_borders(table, hex_color="606c38", size=4):
+def set_cell_borders(table, hex_color="E5DEF1", size=4):
     borders = OxmlElement("w:tblBorders")
     for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
         e = OxmlElement(f"w:{edge}")
@@ -70,7 +76,7 @@ def add_page_number_footer(section):
     p = section.footer.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p.add_run()
-    run_font(run, "Calibri", 9, color=OLIVE)
+    run_font(run, BODY_FONT, 9, color=VIOLET)
     for kind, instr in (("begin", None), ("instr", "PAGE"), ("end", None)):
         if kind == "instr":
             el = OxmlElement("w:instrText")
@@ -80,6 +86,17 @@ def add_page_number_footer(section):
             el = OxmlElement("w:fldChar")
             el.set(qn("w:fldCharType"), kind)
         run._r.append(el)
+
+
+def set_col_widths(table, widths_cm):
+    """python-docx only honours a width set on every cell of the column, and
+    only when autofit is off. Widths come from the JSON in centimetres."""
+    table.autofit = False
+    for i, cm_width in enumerate(widths_cm):
+        width = Cm(cm_width)
+        table.columns[i].width = width
+        for cell in table.columns[i].cells:
+            cell.width = width
 
 
 def build_table(doc, block):
@@ -96,24 +113,27 @@ def build_table(doc, block):
     for i, text in enumerate(headers):
         cell = header.cells[i]
         cell.text = ""
-        shade(cell, "283618")
+        shade(cell, HEADER_FILL)
         para = cell.paragraphs[0]
         para.paragraph_format.space_after = Pt(2)
         para.paragraph_format.space_before = Pt(2)
-        run_font(para.add_run(text), "Calibri", 9.5, bold=True, color=CREAM)
+        run_font(para.add_run(text), BODY_FONT, 9.5, bold=True, color=WHITE)
 
     for r, row in enumerate(rows):
         cells = table.add_row().cells
         for i, text in enumerate(row):
             cells[i].text = ""
             if r % 2 == 1:
-                shade(cells[i], "F4EFD4")
+                shade(cells[i], ZEBRA_FILL)
             para = cells[i].paragraphs[0]
             para.paragraph_format.space_after = Pt(2)
             para.paragraph_format.space_before = Pt(2)
-            run_font(para.add_run(text), "Calibri", 9.5, color=INK)
+            run_font(para.add_run(text), BODY_FONT, 9.5, color=INK)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+    if block.get("widths"):
+        set_col_widths(table, block["widths"])
 
 
 def build(doc):
@@ -129,40 +149,40 @@ def build(doc):
     add_page_number_footer(section)
 
     style = doc.styles["Normal"]
-    style.font.name = "Calibri"
+    style.font.name = BODY_FONT
     style.font.size = Pt(11)
     style.paragraph_format.space_after = Pt(8)
     style.paragraph_format.line_spacing = 1.15
 
     title = doc.add_paragraph()
     title.paragraph_format.space_after = Pt(2)
-    run_font(title.add_run(cfg["title"]), "Georgia", 24, bold=True, color=DARK)
+    run_font(title.add_run(cfg["title"]), DISPLAY_FONT, 26, bold=True, color=INK)
 
     sub = doc.add_paragraph()
     sub.paragraph_format.space_after = Pt(2)
-    run_font(sub.add_run(cfg["subtitle"]), "Calibri", 12, color=OLIVE)
+    run_font(sub.add_run(cfg["subtitle"]), BODY_FONT, 12.5, color=VIOLET)
 
     who = doc.add_paragraph()
     who.paragraph_format.space_after = Pt(14)
-    run_font(who.add_run(cfg["author"]), "Calibri", 10.5, color=OLIVE)
+    run_font(who.add_run(cfg["author"]), BODY_FONT, 10.5, color=VIOLET)
 
     for sec in cfg["sections"]:
         head = doc.add_paragraph()
         head.paragraph_format.space_before = Pt(16)
         head.paragraph_format.space_after = Pt(6)
         head.paragraph_format.keep_with_next = True
-        run_font(head.add_run(sec["heading"]), "Georgia", 15, bold=True, color=DARK)
+        run_font(head.add_run(sec["heading"]), DISPLAY_FONT, 17, bold=True, color=ACCENT)
 
         for block in sec.get("content", []):
             kind = block.get("type")
             if kind == "paragraph":
                 p = doc.add_paragraph()
-                run_font(p.add_run(block["text"]), "Calibri", 11, color=INK)
+                run_font(p.add_run(block["text"]), BODY_FONT, 11.5, color=INK)
             elif kind == "list":
                 for item in block.get("items", []):
                     p = doc.add_paragraph(style="List Bullet")
                     p.paragraph_format.space_after = Pt(3)
-                    run_font(p.add_run(item), "Calibri", 11, color=INK)
+                    run_font(p.add_run(item), BODY_FONT, 11.5, color=INK)
             elif kind == "table":
                 build_table(doc, block)
 
