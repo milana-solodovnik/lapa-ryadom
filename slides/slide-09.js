@@ -1,118 +1,114 @@
-// Slide 9 -- Appendix: timing variants 5 / 7 / 10 minutes
+// Slide 9 -- Доказательство переноса на Digital Q.DataBase.
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
   slide.background = { color: theme.bg };
 
   addPageBadge(pres, slide, theme, 9);
 
-  slide.addText('ПРИЛОЖЕНИЕ -- тайминг выступления', {
-    x: 0.6, y: 0.3, w: 6.0, h: 0.26, margin: 0,
-    fontFace: 'Calibri', fontSize: 10, color: theme.accent, charSpacing: 1.2, bold: true
+  slide.addText('Перенос выполнен на настоящей Digital Q.DataBase', {
+    x: 0.6, y: 0.24, w: 9.0, h: 0.46, margin: 0,
+    fontFace: 'Georgia', fontSize: 23, bold: true, color: theme.primary, fit: 'shrink'
   });
+  slide.addText(
+    'Схема применена без единой правки, данные перенесены одной транзакцией, расхождений не найдено.',
+    {
+      x: 0.6, y: 0.70, w: 9.0, h: 0.4, margin: 0,
+      fontFace: 'Calibri', fontSize: 11.5, color: theme.secondary
+    }
+  );
 
-  slide.addText('Сколько успеем сказать', {
-    x: 0.6, y: 0.6, w: 8.8, h: 0.55, margin: 0,
-    fontFace: 'Georgia', fontSize: 26, bold: true, color: theme.primary
-  });
-
-  slide.addText('Точный лимит нужно согласовать с организаторами. Запас времени лучше брать сокращением вступления, а не демонстрации.', {
-    x: 0.6, y: 1.16, w: 8.8, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 12, color: theme.secondary
-  });
-
-  // ---- 7 minutes: the baseline ----
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 1.6, w: 4.28, h: 2.44, fill: { color: theme.light },
-    shadow: { type: 'outer', color: '000000', blur: 6, offset: 2, angle: 135, opacity: 0.1 }
-  });
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 1.6, w: 4.28, h: 0.06, fill: { color: theme.secondary }
-  });
-  slide.addText('7 минут -- базовый вариант', {
-    x: 0.84, y: 1.76, w: 3.8, h: 0.3, margin: 0,
-    fontFace: 'Georgia', fontSize: 13.5, bold: true, color: theme.primary
-  });
-
-  const base = [
-    ['00:00', 'Вступление и бытовая ситуация', '0:40'],
-    ['00:40', 'Проблема и идея', '0:55'],
-    ['01:35', 'От заявки до приёмки (кадры D0 → D2)', '3:10'],
-    ['04:45', 'Учёт, транзакции, база данных', '1:25'],
-    ['06:10', 'Итог и следующие шаги', '0:50']
+  const tiles = [
+    { big: '15/15', cap: 'проб совместимости\nна целевой базе' },
+    { big: '25/25', cap: 'проверок сверки\nпосле переноса' },
+    { big: '60/60', cap: 'тестов приложения,\nпрогнанных на QDB' },
+    { big: '0', cap: 'правок в DDL\nпри переносе схемы' }
   ];
-  base.forEach(function (r, i) {
-    const y = 2.16 + i * 0.34;
-    slide.addText(r[0], {
-      x: 0.84, y: y, w: 0.62, h: 0.28, margin: 0,
-      fontFace: 'Consolas', fontSize: 10, color: theme.primary
+  const TW = 2.26;
+  const GAP = 0.07;
+  tiles.forEach(function (t, i) {
+    const x = 0.62 + i * (TW + GAP);
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: x, y: 1.22, w: TW, h: 0.94, fill: { color: theme.light }
     });
-    slide.addText(r[1], {
-      x: 1.5, y: y, w: 2.6, h: 0.28, margin: 0,
-      fontFace: 'Calibri', fontSize: 10.5, color: theme.primary
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: x, y: 1.22, w: 0.09, h: 0.94, fill: { color: theme.accent }
     });
-    slide.addText(r[2], {
-      x: 4.14, y: y, w: 0.6, h: 0.28, margin: 0, align: 'right',
-      fontFace: 'Calibri', fontSize: 10.5, color: theme.accent, bold: true
+    slide.addText(t.big, {
+      x: x + 0.2, y: 1.26, w: TW - 0.3, h: 0.46, margin: 0,
+      fontFace: 'Georgia', fontSize: 24, bold: true, color: theme.primary
+    });
+    slide.addText(t.cap, {
+      x: x + 0.2, y: 1.70, w: TW - 0.3, h: 0.42, margin: 0,
+      fontFace: 'Calibri', fontSize: 9, color: theme.primary
     });
   });
 
-  // ---- 5 minutes ----
+  const PANEL_W = 3.94;
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.12, y: 1.6, w: 4.28, h: 1.16, fill: { color: theme.light },
-    shadow: { type: 'outer', color: '000000', blur: 6, offset: 2, angle: 135, opacity: 0.1 }
+    x: 0.62, y: 2.36, w: PANEL_W, h: 0.26, fill: { color: theme.secondary }
   });
-  slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.12, y: 1.6, w: 4.28, h: 0.06, fill: { color: theme.accent }
+  slide.addText('ПРИЛОЖЕНИЕ НА ЦЕЛЕВОЙ БАЗЕ — КАТАЛОГ ПОСЛЕ ПРИЁМКИ', {
+    x: 0.68, y: 2.36, w: PANEL_W - 0.12, h: 0.26, margin: 0, valign: 'middle',
+    fontFace: 'Calibri', fontSize: 7.5, bold: true, color: theme.bg, charSpacing: 0.5
   });
-  slide.addText('5 минут -- сокращённый', {
-    x: 5.36, y: 1.74, w: 3.8, h: 0.28, margin: 0,
-    fontFace: 'Georgia', fontSize: 13.5, bold: true, color: theme.primary
+
+  const IMG_W = 3.5;
+  const IMG_H = IMG_W / (1280 / 900);
+  slide.addImage({
+    path: 'screenshots/needs-catalog-d2.png',
+    x: 0.62 + (PANEL_W - IMG_W) / 2, y: 2.64, w: IMG_W, h: IMG_H
   });
   slide.addText([
-    { text: 'Слайды 1--3 сводим в одно вступление', options: { bullet: true, breakLine: true } },
-    { text: 'Не создаём приют и потребность на сцоне', options: { bullet: true, breakLine: true } },
-    { text: 'Один пример, одна проверенная фраза о базе', options: { bullet: true } }
+    { text: 'Сухой корм: 50 / 0 / 3 / 47 — те же счётчики, что и до переноса.', options: { breakLine: true } },
+    { text: 'Перенесено одной транзакцией: 3 приюта, 4 аккаунта, 10 потребностей, 4 предложения, 1 доставка.', options: {} }
   ], {
-    x: 5.36, y: 2.04, w: 3.8, h: 0.66, margin: 0,
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.primary, paraSpaceAfter: 2
+    x: 0.62, y: 5.08, w: PANEL_W, h: 0.44, margin: 0,
+    fontFace: 'Calibri', fontSize: 7.5, color: theme.secondary, italic: true
   });
 
-  // ---- 10 minutes ----
+  const RX = 4.74;
+  const RW = 4.64;
+
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.12, y: 2.88, w: 4.28, h: 1.16, fill: { color: theme.light },
-    shadow: { type: 'outer', color: '000000', blur: 6, offset: 2, angle: 135, opacity: 0.1 }
+    x: RX, y: 2.36, w: RW, h: 1.24,
+    fill: { color: theme.bg }, line: { color: theme.secondary, width: 1 }
   });
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 5.12, y: 2.88, w: 4.28, h: 0.06, fill: { color: theme.accent }
+    x: RX, y: 2.36, w: 0.06, h: 1.24, fill: { color: theme.accent }
   });
-  slide.addText('10 минут -- расширенный', {
-    x: 5.36, y: 3.02, w: 3.8, h: 0.28, margin: 0,
-    fontFace: 'Georgia', fontSize: 13.5, bold: true, color: theme.primary
+  slide.addText('КАК МЫ УБЕДИЛИСЬ, ЧТО ЭТО Q.DATABASE', {
+    x: RX + 0.2, y: 2.42, w: RW - 0.3, h: 0.24, margin: 0,
+    fontFace: 'Calibri', fontSize: 8.5, bold: true, color: theme.accent, charSpacing: 0.6
   });
   slide.addText([
-    { text: 'Базовый сценарий 7 минут', options: { bullet: true, breakLine: true } },
-    { text: 'Конкурентный запрос на последний остаток (+0:50)', options: { bullet: true, breakLine: true } },
-    { text: 'Показ переноса и сверки (+1:10) и вывод о развитии (+0:40)', options: { bullet: true } }
+    { text: 'На запрос версии Q.DataBase отвечает как «PostgreSQL 18.2» и не называет себя.',
+      options: { breakLine: true, bullet: true } },
+    { text: 'Поэтому идентификация сделана по каталогу: 4 процедуры qdb_*, 15 объектов dgrid_*, 20 настроек qdb_*, подключённые pg_cron и pg_stat_statements. В обычном PostgreSQL этого нет.',
+      options: { bullet: true } }
   ], {
-    x: 5.36, y: 3.32, w: 3.8, h: 0.66, margin: 0,
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.primary, paraSpaceAfter: 2
+    x: RX + 0.2, y: 2.66, w: RW - 0.34, h: 0.88, margin: 0,
+    fontFace: 'Calibri', fontSize: 9, color: theme.primary, paraSpaceAfter: 2
   });
 
-  // ---- Bottom reminder ----
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.6, y: 4.24, w: 8.8, h: 0.82, fill: { color: theme.primary }
+    x: RX, y: 3.70, w: RW, h: 1.24,
+    fill: { color: theme.bg }, line: { color: theme.secondary, width: 1 }
+  });
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: RX, y: 3.70, w: 0.06, h: 1.24, fill: { color: theme.primary }
+  });
+  slide.addText('ДВА ОТЛИЧИЯ, КОТОРЫЕ ПРИШЛОСЬ УЧЕСТЬ', {
+    x: RX + 0.2, y: 3.76, w: RW - 0.3, h: 0.24, margin: 0,
+    fontFace: 'Calibri', fontSize: 8.5, bold: true, color: theme.primary, charSpacing: 0.6
   });
   slide.addText([
-    { text: 'Короткая формула для ведущего: ', options: { bold: true } },
-    { text: '"Я покажу, как пять обещанных упаковок превращаются в три реально полученные -- и почему система не путает эти значения".', options: {} }
+    { text: 'Метка времени: QDB хранит миллисекунды, PostgreSQL — микросекунды. Сверка идёт по округлению до миллисекунд, иначе получается ложное расхождение.',
+      options: { breakLine: true, bullet: true } },
+    { text: 'Сообщение о нарушении уникальности приходит по-русски, поэтому дубликат определяется по коду ошибки, а не по тексту.',
+      options: { bullet: true } }
   ], {
-    x: 0.86, y: 4.3, w: 8.28, h: 0.7, margin: 0, valign: 'middle',
-    fontFace: 'Calibri', fontSize: 13, color: theme.bg
-  });
-
-  slide.addText('Расширение добавляем только проверенными фактами, а не перечислением возможностей, которых ещё нет.', {
-    x: 0.6, y: 5.14, w: 8.6, h: 0.28, margin: 0,
-    fontFace: 'Calibri', fontSize: 9.5, color: theme.secondary, italic: true
+    x: RX + 0.2, y: 4.00, w: RW - 0.34, h: 0.88, margin: 0,
+    fontFace: 'Calibri', fontSize: 9, color: theme.primary, paraSpaceAfter: 2
   });
 
   return slide;
@@ -120,10 +116,10 @@ function createSlide(pres, theme) {
 
 function addPageBadge(pres, slide, theme, n) {
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, fill: { color: theme.primary }
+    x: 9.3, y: 5.18, w: 0.42, h: 0.3, fill: { color: theme.primary }
   });
   slide.addText(String(n), {
-    x: 9.3, y: 5.1, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
+    x: 9.3, y: 5.18, w: 0.42, h: 0.3, margin: 0, align: 'center', valign: 'middle',
     fontFace: 'Calibri', fontSize: 11, color: theme.bg
   });
 }

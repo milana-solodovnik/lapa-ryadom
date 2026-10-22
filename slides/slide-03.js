@@ -70,7 +70,7 @@ function createSlide(pres, theme) {
   });
   slide.addText([
     { text: 'Итог после передачи:   ', options: { bold: true } },
-    { text: '20 требуется   |   0 обещано   |   3 получено   |   17 свободно', options: {} }
+    { text: '50 требуется   |   0 обещано   |   3 получено   |   47 свободно', options: {} }
   ], {
     x: 0.9, y: 4.5, w: 8.2, h: 0.62, margin: 0, valign: 'middle',
     fontFace: 'Calibri', fontSize: 14, color: theme.bg

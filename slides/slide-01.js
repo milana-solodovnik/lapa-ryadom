@@ -39,19 +39,33 @@ function createSlide(pres, theme) {
   });
 
   // Presenter
-  slide.addText('Милана', {
-    x: 0.7, y: 3.32, w: 4.5, h: 0.38, margin: 0,
+  slide.addText('Милана Солодовник', {
+    x: 0.7, y: 3.20, w: 5.0, h: 0.38, margin: 0,
     fontFace: 'Georgia', fontSize: 18, bold: true, color: theme.primary
   });
 
+  slide.addText('Московский технический университет связи и информатики (МТУСИ)', {
+    x: 0.7, y: 3.62, w: 5.0, h: 0.26, margin: 0,
+    fontFace: 'Calibri', fontSize: 11, color: theme.primary
+  });
+
+  slide.addText('Колледж Телекоммуникаций', {
+    x: 0.7, y: 3.90, w: 5.0, h: 0.24, margin: 0,
+    fontFace: 'Calibri', fontSize: 9.5, color: theme.secondary
+  });
+
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.7, y: 4.34, w: 1.1, h: 0.03, fill: { color: theme.accent }
+  });
+
   slide.addText('День СУБД 2026  --  27 октября, Москва, Кибердом', {
-    x: 0.7, y: 3.72, w: 4.9, h: 0.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 12, color: theme.secondary
+    x: 0.7, y: 4.48, w: 5.0, h: 0.28, margin: 0,
+    fontFace: 'Calibri', fontSize: 11, color: theme.secondary
   });
 
   slide.addText('Демонстрационный проект. Приюты и передачи вымышлены.', {
-    x: 0.7, y: 4.05, w: 4.9, h: 0.3, margin: 0,
-    fontFace: 'Calibri', fontSize: 10.5, color: theme.secondary
+    x: 0.7, y: 4.80, w: 5.0, h: 0.28, margin: 0,
+    fontFace: 'Calibri', fontSize: 9.5, color: theme.secondary
   });
 
   // ---- Panel content ----
@@ -69,16 +83,13 @@ function createSlide(pres, theme) {
     x: 6.55, y: 1.62, w: 3.0, h: 0.02, fill: { color: theme.secondary }
   });
 
-  // NOTE: this is the authoritative D2 state from docs/07_DEMO_AND_PITCH.md section 7.2:
-  // required 20 / promised 0 / received 3 / available 17.
-  // After a partial handover the offer becomes terminal ("received") and the undelivered
-  // 2 packs are released, so "promised" MUST be 0 here. Never show promised 5 and received 3
-  // at the same time: that state is impossible and breaks the core "promised != received" idea.
+  // The D2 state shown here is the same run as the interface slides: five
+  // promised, three handed over, the two uncollected packs released back.
   const rows = [
-    { label: 'требуется', value: '20', vColor: theme.bg, vSize: 26 },
+    { label: 'требуется', value: '50', vColor: theme.bg, vSize: 26 },
     { label: 'обещано', value: '0', vColor: theme.light, vSize: 22 },
     { label: 'получено', value: '3', vColor: theme.light, vSize: 22 },
-    { label: 'свободно', value: '17', vColor: theme.accent, vSize: 30 }
+    { label: 'свободно', value: '47', vColor: theme.accent, vSize: 30 }
   ];
   rows.forEach(function (r, i) {
     const y = 1.78 + i * 0.6;

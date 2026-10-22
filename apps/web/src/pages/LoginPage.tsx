@@ -11,8 +11,11 @@ interface AuthState {
 
 export function LoginPage(): JSX.Element {
   const nav = useNavigate();
-  const [username, setUsername] = useState('rep_a');
-  const [password, setPassword] = useState('dev-rep-a-pwd-123');
+  // The form starts empty on purpose. It used to ship with rep_a and a
+  // placeholder password pre-filled, which read as a real credential on a
+  // presentation screenshot while not being the one the server accepts.
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [state, setState] = useState<AuthState>({ loading: false, error: null, goto: null });
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -50,8 +53,8 @@ export function LoginPage(): JSX.Element {
       <header>
         <h1>Вход для представителя приюта</h1>
         <p>
-          Эта страница открывается только когда нужно подтвердить физическую передачу
-          помощи (шаг D2 сценария). Дарители могут оставлять заявки без входа.
+          Вход есть только у представителя приюта — он подтверждает, что помощь
+          действительно привезли. Посетители оставляют заявки без входа.
         </p>
       </header>
 
@@ -100,17 +103,7 @@ export function LoginPage(): JSX.Element {
             Выйти (если уже вошёл)
           </button>
         </div>
-        <details>
-          <summary>Что подставляется в полях по умолчанию?</summary>
-          <p>
-            Учётки и пароли приходят из <code>db/seed/data.mjs</code> и переменных
-            окружения <code>DEMO_REP_*_PASSWORD</code>. Демо-пароль
-            <code> dev-rep-a-pwd-123 </code>, его можно поменять через <code>.env</code>.
-            В рабочей версии сюда вели бы cookie-сессию автоматически — сейчас срок
-            8 часов, как задаёт <code>SESSION_TTL_HOURS</code>.
-          </p>
-        </details>
-      </form>
+        </form>
     </section>
   );
 }

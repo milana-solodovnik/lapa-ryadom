@@ -91,8 +91,11 @@ def main(path):
     else:
         print("PLACEHOLDER TEXT: PASS (no lorem/ipsum/xxxx/TODO)")
 
-    # Key facts that must be present per docs/07_DEMO_AND_PITCH.md
-    required = ["20", "5", "3", "17", "Digital Q.DataBase", "Лапа рядом", "Милана"]
+    # The counters must be the ones the real Digital Q.DataBase run produced:
+    # target 50, five promised, three received, 47 left free. If someone
+    # reinstates the old invented 20/17 pair this check fails, which is the
+    # point.
+    required = ["50", "5", "3", "47", "Digital Q.DataBase", "Лапа рядом", "Милана"]
     missing = [k for k in required if k not in blob]
     if missing:
         print(f"KEY FACTS: FAIL -> missing {missing}")

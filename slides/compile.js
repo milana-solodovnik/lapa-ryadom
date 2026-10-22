@@ -23,15 +23,16 @@ const theme = {
 };
 
 const order = [
-  './slide-01.js',
-  './slide-02.js',
-  './slide-03.js',
-  './slide-04.js',
-  './slide-05.js',
-  './slide-06.js',
-  './slide-07.js',
-  './slide-08.js',
-  './slide-09.js'
+  './slide-01.js', // титул
+  './slide-02.js', // проблема
+  './slide-03.js', // четыре шага
+  './slide-04.js', // интерфейс: каталог
+  './slide-05.js', // интерфейс: заявки
+  './slide-06.js', // интерфейс: вход приюта
+  './slide-07.js', // интерфейс: приёмка
+  './slide-08.js', // что делает база данных
+  './slide-09.js', // доказательство переноса
+  './slide-10.js'  // итог
 ];
 
 order.forEach(function (f) {

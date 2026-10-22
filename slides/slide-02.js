@@ -24,7 +24,7 @@ function createSlide(pres, theme) {
     x: 0.85, y: 1.52, w: 3.1, h: 0.28, margin: 0,
     fontFace: 'Calibri', fontSize: 11, color: theme.primary, charSpacing: 1.4, bold: true
   });
-  slide.addText('Нужны 20 упаковок корма', {
+  slide.addText('Нужны 50 упаковок корма', {
     x: 0.85, y: 1.84, w: 3.1, h: 0.62, margin: 0,
     fontFace: 'Georgia', fontSize: 16, bold: true, color: theme.primary
   });
