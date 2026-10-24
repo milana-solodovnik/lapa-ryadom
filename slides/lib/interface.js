@@ -3,8 +3,8 @@
 // Первая версия клала четыре снимка 1280x900 в ряд, и каждый кадр выходил
 // около 2.1 дюйма — с заднего ряда не прочитать. Разбивка по одному снимку
 // на слайд решила читаемость, но раздвинула деку до десяти слайдов. Два кадра
-// на слайд — компромисс, который сохраняет оба условия: 4.05 дюйма на кадр
-// при семи слайдах.
+// на слайд — компромисс, который сохраняет оба условия: 4.275 дюйма на кадр
+// на семи рабочих слайдах.
 //
 // Снимки делает scripts/capture-qdb-screenshots.ps1 с работающего приложения,
 // у которого API смотрит в Digital Q.DataBase 18.2.
@@ -17,22 +17,24 @@ function buildInterfaceSlide(pres, theme, cfg) {
   B.light(pres, slide);
   B.pageNo(pres, slide, cfg.n);
 
-  // Левое поле 0.6" — единая сетка со слайдами 2, 3, 6, 7 (brand.M).
+  // Единая сетка деки: левое поле 0.6" (brand.M), правое — 9.4".
+  // Два кадра делят это поле поровну, поэтому правый край снимков и счётчиков
+  // совпадает с правым краем слайдов 2, 3, 6, 7.
   slide.addText('Интерфейс', {
-    x: 0.6, y: 0.16, w: 3.6, h: 0.42, margin: 0,
+    x: B.M, y: 0.16, w: 3.6, h: 0.40, margin: 0,
     fontFace: theme.fontDisplay, fontSize: 26, bold: true, color: theme.ink
   });
   slide.addText(cfg.subtitle, {
-    x: 0.6, y: 0.58, w: 8.4, h: 0.3, margin: 0,
+    x: B.M, y: 0.54, w: 8.8, h: 0.3, margin: 0,
     fontFace: theme.fontBody, fontSize: 12, color: theme.violet
   });
 
-  const FRAME_W = 4.05;
   const GAP = 0.25;
   const HEAD_H = 0.3;
-  const IMG_H = FRAME_W / IMG_ASPECT;
-  const x0 = 0.6;
-  const y = 0.98;
+  const FRAME_W = (B.SLIDE_W - 2 * B.M - GAP) / 2;   // 4.275"
+  const IMG_H = FRAME_W / IMG_ASPECT;                  // 3.006"
+  const x0 = B.M;
+  const y = 0.88;
 
   cfg.frames.forEach(function (f, i) {
     const x = x0 + i * (FRAME_W + GAP);
@@ -64,11 +66,15 @@ function buildInterfaceSlide(pres, theme, cfg) {
   });
 
   // Счётчики — ради чего, собственно, снимки и нужны.
-  const stripY = 4.60;
-  const cellW = (FRAME_W + GAP) / cfg.counters.length;
+  //
+  // Каждый счётчик стоит под своим кадром: он показывает цифры на том шаге,
+  // который снимок и запечатлел (на слайде 5 слева — состояние до приёмки,
+  // справа — после). Ширина карточки равна ширине кадра, чтобы низ слайда
+  // читался двумя колонками, а не сбоем влево.
+  const stripY = 4.62;
   cfg.counters.forEach(function (c, i) {
-    const x = x0 + i * cellW;
-    const w = cellW - 0.16;
+    const x = x0 + i * (FRAME_W + GAP);
+    const w = FRAME_W;
     slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
       x: x, y: stripY, w: w, h: 0.42, rectRadius: 0.06,
       fill: { color: theme.white },
@@ -82,7 +88,7 @@ function buildInterfaceSlide(pres, theme, cfg) {
   });
 
   slide.addText(cfg.note, {
-    x: 0.6, y: 5.08, w: 8.0, h: 0.24, margin: 0,
+    x: B.M, y: 5.10, w: 8.0, h: 0.24, margin: 0,
     fontFace: theme.fontBody, fontSize: 8.5, color: theme.muted, italic: true
   });
 
