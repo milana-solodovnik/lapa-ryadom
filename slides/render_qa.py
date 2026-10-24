@@ -33,7 +33,18 @@ def soffice():
     raise SystemExit("LibreOffice не найден: нужен soffice.exe для рендера в PDF")
 
 
+def force_utf8():
+    """Переводит вывод в UTF-8: консоль Windows по умолчанию cp1252,
+    и русский текст роняет скрипт с UnicodeEncodeError."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
+
 def main():
+    force_utf8()
     dpi = int(sys.argv[1]) if len(sys.argv) > 1 else 140
 
     print("[1/3] сборка презентации")
