@@ -58,42 +58,43 @@ function createSlide(pres, theme) {
   });
 
   // ---- Левая часть ----
-  B.eyebrow(pres, slide, 'КОНКУРС DIGITAL Q.DATABASE 2026', { x: 0.68, y: 0.86, w: 4.6 });
+  // Левое поле 0.6" — единая сетка со слайдами 2, 3, 6, 7 (brand.M).
+  B.eyebrow(pres, slide, 'КОНКУРС DIGITAL Q.DATABASE 2026', { x: 0.6, y: 0.86, w: 4.6 });
 
   slide.addText('Лапа рядом', {
-    x: 0.64, y: 1.14, w: 4.6, h: 0.86, margin: 0,
+    x: 0.6, y: 1.16, w: 4.6, h: 0.86, margin: 0,
     fontFace: theme.fontDisplay, fontSize: 50, bold: true, color: theme.ink, fit: 'shrink'
   });
   slide.addText('Адресная помощь приютам для животных', {
-    x: 0.68, y: 2.04, w: 4.6, h: 0.34, margin: 0,
+    x: 0.6, y: 2.18, w: 4.6, h: 0.34, margin: 0,
     fontFace: theme.fontBody, fontSize: 15.5, color: theme.body
   });
 
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.68, y: 2.58, w: 1.05, h: 0.035, fill: { color: theme.accent }
+    x: 0.6, y: 2.78, w: 1.05, h: 0.035, fill: { color: theme.accent }
   });
 
   slide.addText('Солодовник М. Е.', {
-    x: 0.68, y: 2.74, w: 4.6, h: 0.34, margin: 0,
+    x: 0.6, y: 2.96, w: 4.6, h: 0.34, margin: 0,
     fontFace: theme.fontDisplay, fontSize: 17, bold: true, color: theme.ink
   });
   slide.addText('Колледж телекоммуникаций Московского технического университета связи и информатики (КТ МТУСИ)', {
-    x: 0.68, y: 3.16, w: 4.6, h: 0.5, margin: 0, valign: 'top',
+    x: 0.6, y: 3.42, w: 4.6, h: 0.5, margin: 0, valign: 'top',
     fontFace: theme.fontBody, fontSize: 10.5, color: theme.body
   });
 
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: 0.68, y: 3.80, w: 1.05, h: 0.02, fill: { color: theme.line }
+    x: 0.6, y: 4.18, w: 1.05, h: 0.02, fill: { color: theme.line }
   });
   slide.addText('День СУБД 2026  —  27 октября, Москва, Кибердом', {
-    x: 0.68, y: 3.92, w: 4.6, h: 0.26, margin: 0,
+    x: 0.6, y: 4.32, w: 4.6, h: 0.26, margin: 0,
     fontFace: theme.fontBody, fontSize: 10.5, color: theme.muted
   });
 
   // Три круга лапки в акцентных цветах — мотив сохраняется, палитра новая.
-  slide.addShape(pres.shapes.OVAL, { x: 4.72, y: 1.12, w: 0.15, h: 0.15, fill: { color: theme.accent } });
-  slide.addShape(pres.shapes.OVAL, { x: 4.93, y: 1.27, w: 0.11, h: 0.11, fill: { color: theme.pink } });
-  slide.addShape(pres.shapes.OVAL, { x: 4.64, y: 1.33, w: 0.09, h: 0.09, fill: { color: theme.violet } });
+  slide.addShape(pres.shapes.OVAL, { x: 4.68, y: 1.14, w: 0.15, h: 0.15, fill: { color: theme.accent } });
+  slide.addShape(pres.shapes.OVAL, { x: 4.89, y: 1.29, w: 0.11, h: 0.11, fill: { color: theme.pink } });
+  slide.addShape(pres.shapes.OVAL, { x: 4.60, y: 1.35, w: 0.09, h: 0.09, fill: { color: theme.violet } });
 
   B.pageNo(pres, slide, 1, 'E3D4F2');
   return slide;
