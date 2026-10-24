@@ -47,7 +47,7 @@ function buildInterfaceSlide(pres, theme, cfg) {
     B.pill(pres, slide, f.step, { x: x + 0.07, y: y + 0.05, w: 0.5, h: HEAD_H - 0.1 }, f.tone);
     slide.addText(f.label, {
       x: x + 0.66, y: y, w: FRAME_W - 0.72, h: HEAD_H, margin: 0, valign: 'middle',
-      fontFace: theme.fontBody, fontSize: 8, bold: true, color: theme.ink, charSpacing: 0.5
+      fontFace: theme.fontBody, fontSize: 8.5, bold: true, color: theme.ink, charSpacing: 0.5
     });
 
     slide.addShape(pres.shapes.RECTANGLE, {
@@ -59,7 +59,7 @@ function buildInterfaceSlide(pres, theme, cfg) {
 
     slide.addText(f.caption, {
       x: x, y: y + HEAD_H + 0.06 + IMG_H, w: FRAME_W, h: 0.34, margin: 0,
-      fontFace: theme.fontBody, fontSize: 8, color: theme.muted
+      fontFace: theme.fontBody, fontSize: 8.5, color: theme.muted
     });
   });
 
