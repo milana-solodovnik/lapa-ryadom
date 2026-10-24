@@ -17,7 +17,7 @@ function createSlide(pres, theme) {
 
   const items = [
     { t: 'Адресность', d: 'Приют публикует потребность, посетитель отвечает на неё — без регистрации и телефона.' },
-    { t: 'Точность', d: 'База различает обещанное и полученное: пять обещанных упаковок и три полученные — это разные числа.' },
+    { t: 'Точность', d: 'База различает обещанное и полученное: 5 обещанных упаковок и 3 полученные — это разные числа.' },
     { t: 'Перенос', d: 'Проект работает на Digital Q.DataBase. Та же база понимает и PostgreSQL, и Microsoft SQL.' }
   ];
 
@@ -39,14 +39,7 @@ function createSlide(pres, theme) {
     });
   });
 
-  slide.addText('СПАСИБО ЗА ВНИМАНИЕ', {
-    x: 0.6, y: 4.26, w: 8.8, h: 0.36, margin: 0, align: 'center',
-    fontFace: theme.fontDisplay, fontSize: 18, bold: true, color: theme.white, charSpacing: 2
-  });
-  slide.addText('Милана Солодовник  ·  МТУСИ, Колледж Телекоммуникаций  ·  День СУБД 2026', {
-    x: 0.6, y: 4.66, w: 8.8, h: 0.28, margin: 0, align: 'center',
-    fontFace: theme.fontBody, fontSize: 10.5, color: 'EEDCF7'
-  });
+  // «Спасибо за внимание» с QR-кодом вынесено на отдельный слайд — slide-08.js.
 
   return slide;
 }

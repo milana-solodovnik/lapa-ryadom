@@ -4,7 +4,7 @@ const { buildInterfaceSlide } = require('./lib/interface.js');
 function createSlide(pres, theme) {
   return buildInterfaceSlide(pres, theme, {
     n: 5,
-    subtitle: 'Приёмку ведёт только представитель приюта. Пять обещанных превращаются в три полученные',
+    subtitle: 'Приёмку ведёт только представитель приюта. 5 обещанных превращаются в 3 полученные.',
     frames: [
       {
         step: 'D2',

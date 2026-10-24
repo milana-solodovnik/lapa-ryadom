@@ -95,7 +95,10 @@ def main(path):
     # target 50, five promised, three received, 47 left free. If someone
     # reinstates the old invented 20/17 pair this check fails, which is the
     # point.
-    required = ["50", "5", "3", "47", "Digital Q.DataBase", "Лапа рядом", "Милана"]
+    # The author is listed as "Солодовник М. Е." — Milana's own choice on the
+    # title slide, so the check looks for the surname and the college.
+    required = ["50", "5", "3", "47", "Digital Q.DataBase", "Лапа рядом",
+                "Солодовник", "КТ МТУСИ", "GitHub"]
     missing = [k for k in required if k not in blob]
     if missing:
         print(f"KEY FACTS: FAIL -> missing {missing}")

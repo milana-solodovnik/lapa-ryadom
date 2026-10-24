@@ -19,7 +19,8 @@ const order = [
   './slide-04.js', // интерфейс: каталог и заявки
   './slide-05.js', // интерфейс: вход и приёмка
   './slide-06.js', // полиглот: PostgreSQL и Microsoft SQL
-  './slide-07.js'  // итог
+  './slide-07.js', // итог
+  './slide-08.js'  // спасибо за внимание + QR на репозиторий
 ];
 
 order.forEach(function (f) {

@@ -73,17 +73,13 @@ function createSlide(pres, theme) {
     x: 0.68, y: 2.58, w: 1.05, h: 0.035, fill: { color: theme.accent }
   });
 
-  slide.addText('Милана Солодовник', {
+  slide.addText('Солодовник М. Е.', {
     x: 0.68, y: 2.74, w: 4.6, h: 0.34, margin: 0,
     fontFace: theme.fontDisplay, fontSize: 17, bold: true, color: theme.ink
   });
-  slide.addText('Московский технический университет связи и информатики (МТУСИ)', {
-    x: 0.68, y: 3.10, w: 4.6, h: 0.24, margin: 0,
+  slide.addText('Колледж телекоммуникаций Московского технического университета связи и информатики (КТ МТУСИ)', {
+    x: 0.68, y: 3.16, w: 4.6, h: 0.5, margin: 0, valign: 'top',
     fontFace: theme.fontBody, fontSize: 10.5, color: theme.body
-  });
-  slide.addText('Колледж Телекоммуникаций', {
-    x: 0.68, y: 3.34, w: 4.6, h: 0.22, margin: 0,
-    fontFace: theme.fontBody, fontSize: 9.5, color: theme.muted
   });
 
   slide.addShape(pres.shapes.RECTANGLE, {
