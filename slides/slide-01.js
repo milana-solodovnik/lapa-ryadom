@@ -50,7 +50,7 @@ function createSlide(pres, theme) {
 
   slide.addText('упаковок сухого корма для собак', {
     x: PX, y: 3.98, w: PW, h: 0.26, margin: 0,
-    fontFace: theme.fontBody, fontSize: 10.5, color: 'E8D9F4'
+    fontFace: theme.fontBody, fontSize: 10.5, color: theme.white
   });
   slide.addText('Обещали 5, привезли 3. Две непривезённые упаковки вернулись в свободный остаток.', {
     x: PX, y: 4.26, w: PW, h: 0.7, margin: 0,
