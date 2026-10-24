@@ -17,12 +17,13 @@ function buildInterfaceSlide(pres, theme, cfg) {
   B.light(pres, slide);
   B.pageNo(pres, slide, cfg.n);
 
+  // Левое поле 0.6" — единая сетка со слайдами 2, 3, 6, 7 (brand.M).
   slide.addText('Интерфейс', {
-    x: 0.8, y: 0.16, w: 3.6, h: 0.42, margin: 0,
+    x: 0.6, y: 0.16, w: 3.6, h: 0.42, margin: 0,
     fontFace: theme.fontDisplay, fontSize: 26, bold: true, color: theme.ink
   });
   slide.addText(cfg.subtitle, {
-    x: 0.8, y: 0.58, w: 8.4, h: 0.3, margin: 0,
+    x: 0.6, y: 0.58, w: 8.4, h: 0.3, margin: 0,
     fontFace: theme.fontBody, fontSize: 12, color: theme.violet
   });
 
@@ -30,7 +31,7 @@ function buildInterfaceSlide(pres, theme, cfg) {
   const GAP = 0.25;
   const HEAD_H = 0.3;
   const IMG_H = FRAME_W / IMG_ASPECT;
-  const x0 = 0.8;
+  const x0 = 0.6;
   const y = 0.98;
 
   cfg.frames.forEach(function (f, i) {
@@ -81,7 +82,7 @@ function buildInterfaceSlide(pres, theme, cfg) {
   });
 
   slide.addText(cfg.note, {
-    x: 0.8, y: 5.08, w: 8.0, h: 0.24, margin: 0,
+    x: 0.6, y: 5.08, w: 8.0, h: 0.24, margin: 0,
     fontFace: theme.fontBody, fontSize: 8.5, color: theme.muted, italic: true
   });
 
