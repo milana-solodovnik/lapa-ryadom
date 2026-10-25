@@ -253,3 +253,48 @@ python slides\make_pdf.py
   состыковку. Наш профиль: он проверит нашу презентацию на месте 26 октября.
 - Он упомянул свои YouTube-плейлисты «Андрей Жуйков IT» с туториалами по
   Oracle- и MS SQL-скриптам — можно сослаться, если понадобится.
+
+## 9. С чего начать в новой сессии
+
+Порядок шагов, чтобы не искать ничего заново:
+
+1. **Прочитать этот документ целиком** — и `andrew/запись разговора с андреем.srt`
+   (в оригинале, а не в пересказе).
+2. **Проверить окружение.** Docker Desktop должен быть запущен, иначе
+   `docker ps` вернёт «Docker Desktop is unable to start». Лечится
+   перезапуском Docker Desktop (бывает после сна/гибернации):
+
+   ```powershell
+   Get-Process -Name "Docker Desktop","com.docker.backend" -ErrorAction SilentlyContinue |
+     Stop-Process -Force
+   Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe" -ArgumentList "-Autostart"
+   docker ps --filter name=qdatabase-18     # ждать health: healthy
+   ```
+
+   Контейнер `qdatabase-18` уже создан, создавать заново не нужно — достаточно
+   `docker start qdatabase-18`. Полная процедура (образ, роли, listen_addresses)
+   — в [`docs/START_HERE_QDB.md`](START_HERE_QDB.md).
+3. **Согласовать новые формулировки с Миланой** — прежде чем вносить их в
+   `slides/slide-06.js` и `slides/speaker-script.json`. Текст слайдов
+   согласован дословно, поэтому новые формулировки сначала показываются ей.
+4. **Править слайд 6 и рассказ о переносе** (задачи A и B из раздела 5).
+5. **Синхронизировать текст выступления и README** (задачи C и D).
+6. **Собрать и проверить**: `python slides\render_qa.py 140`, затем
+   `python slides\qa_dump.py output\lapa-ryadom-pitch.pptx` — четыре PASS,
+   затем `python scripts\build-speaker-docx.py` и `python slides\make_pdf.py`.
+
+**Чего делать нельзя:** копировать слайды вендора из `andrew/здесь слайды 10 и
+7 и 6.pptx` в нашу деку — это материалы «Диасофта». Можно использовать
+только факты и формулировки, своими словами и в нашей палитре.
+
+## 10. Состояние на момент передачи
+
+- Репозиторий `F:\MVP\hakaton`, ветка `main`, все коммиты отправлены в
+  origin/main, рабочее дерево чистое.
+- Дека: 8 слайдов, `slides/output/lapa-ryadom-pitch.pptx` + `.pdf` +
+  копия текста выступления — все три в `slides/output/`.
+- Проверки деки (`slides/qa_dump.py`): четыре PASS.
+- Доказательства по базе: сверка переноса 25/25, тесты 60/60, проверка
+  Microsoft SQL 9/9 — прогон выполнен повторно 25.10, вердикт
+  `DIGITAL Q.DATABASE ACCEPTS MICROSOFT SQL`.
+
